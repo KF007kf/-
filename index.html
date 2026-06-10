@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReviewFork NTRGAME - 成人向游戏测评档案</title>
+    <meta
+      name="description"
+      content="Pitchfork-inspired adult game review blog for NTR visual novels, rankings, previews, and studio notes."
+    />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="./assets/images/site/masthead.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="./data/site-data.js"></script>
+    <script src="./config/firebase-config.js"></script>
+    <script src="./scripts/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ReviewFork home">
+        <img src="./assets/images/site/masthead.svg" alt="" class="brand-mark" />
+        <span>
+          <strong id="brand-name">ReviewFork</strong>
+          <small id="brand-subtitle">NTRGAME Editorial Archive</small>
+        </span>
+      </a>
+      <nav class="top-nav" id="top-nav" aria-label="主导航">
+        <a href="#reviews">Reviews</a>
+        <a href="#watchlist">Watchlist</a>
+        <a href="#rankings">Rankings</a>
+        <a href="#community">Community</a>
+        <a href="#notes">Notes</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="issue-strip" aria-label="站点信息">
+        <span id="issue-label">Issue 00</span>
+        <span>18+ Editorial / No downloads</span>
+        <span>所有条目默认只讨论成年角色</span>
+      </section>
+
+      <section class="hero-layout" id="hero"></section>
+
+      <section class="control-bar" aria-label="筛选测评">
+        <label class="search-box">
+          <span>Search</span>
+          <input id="search-input" type="search" placeholder="标题、社团、标签" autocomplete="off" />
+        </label>
+        <div class="tag-filter" id="tag-filter" aria-label="标签筛选"></div>
+      </section>
+
+      <section class="section-rule" id="reviews" data-section="reviews">
+        <div>
+          <span>Reviews</span>
+          <h2>Latest Criticism</h2>
+        </div>
+        <p>短评、长评、雷点说明和评分都来自同一个数据文件，方便你之后继续扩写。</p>
+      </section>
+
+      <section class="review-grid" id="review-grid" aria-live="polite"></section>
+
+      <section class="split-band" id="watchlist" data-section="watchlist">
+        <div class="section-rule compact">
+          <div>
+            <span>Watchlist</span>
+            <h2>New Release Radar</h2>
+          </div>
+        </div>
+        <div class="watchlist" id="watchlist-list"></div>
+      </section>
+
+      <section class="rankings" id="rankings" data-section="rankings">
+        <div class="section-rule compact">
+          <div>
+            <span>Rankings</span>
+            <h2>Editor's Board</h2>
+          </div>
+        </div>
+        <div class="ranking-grid" id="ranking-grid"></div>
+      </section>
+
+      <section class="community" id="community" data-section="community">
+        <div class="section-rule compact">
+          <div>
+            <span>Community</span>
+            <h2>Likes & Polls</h2>
+          </div>
+          <p id="cloud-status">互动数据：本地预览模式。配置 Firebase 后，访客会看到同一份点赞和投票结果。</p>
+        </div>
+        <div class="poll-grid" id="poll-grid"></div>
+      </section>
+
+      <section class="notes" id="notes" data-section="notes">
+        <div class="note-block">
+          <span>Archive</span>
+          <h2>Design references</h2>
+          <p>
+            原型文件已放进仓库的 <code>reference/</code>。正式博客使用现在这套轻量结构，方便直接部署到
+            GitHub Pages。
+          </p>
+          <div class="reference-links">
+            <a href="./reference/ReviewFork_Pitchfork研究重设计版.html">ReviewFork prototype</a>
+            <a href="./reference/新作前瞻.html">Upcoming prototype</a>
+          </div>
+        </div>
+        <div class="note-block red">
+          <span>Images</span>
+          <h2>Public asset rule</h2>
+          <p>
+            别人能看到的图片必须在仓库里，例如 <code>assets/images/covers/xxx.jpg</code>。
+            不要引用桌面路径或只存在浏览器里的图片。
+          </p>
+        </div>
+        <div class="note-block">
+          <span>Interactions</span>
+          <h2>Firebase sync</h2>
+          <p>
+            点赞和投票的云端同步配置写在 <code>config/firebase-config.js</code>。
+            详细步骤在 <code>FIREBASE_SETUP.md</code>。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="article-dialog" id="article-dialog">
+      <article class="article-sheet" id="article-sheet"></article>
+      <button class="dialog-close" id="dialog-close" aria-label="关闭文章">Close</button>
+    </dialog>
+
+    <footer class="site-footer">
+      <span id="footer-brand">ReviewFork</span>
+      <span>Built for GitHub Pages. Images live in the repository.</span>
+    </footer>
+
+    <noscript>
+      <div class="noscript">这个站点需要开启 JavaScript 才能读取测评数据。</div>
+    </noscript>
+  </body>
+</html>

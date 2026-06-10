@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="Signal Bride cover placeholder">
+  <rect width="900" height="1200" fill="#f7f4ec"/>
+  <rect x="64" y="64" width="772" height="1072" fill="none" stroke="#070707" stroke-width="14"/>
+  <path d="M450 134v790" stroke="#070707" stroke-width="10"/>
+  <path d="M160 280c180 80 400 80 580 0M160 420c180 80 400 80 580 0M160 560c180 80 400 80 580 0" fill="none" stroke="#ff3530" stroke-width="16"/>
+  <text x="108" y="980" fill="#070707" font-family="Georgia, serif" font-size="94" font-style="italic" font-weight="900">Signal</text>
+  <text x="108" y="1076" fill="#ff3530" font-family="Arial, sans-serif" font-size="86" font-weight="900">BRIDE</text>
+</svg>

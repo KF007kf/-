@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-label="Character placeholder">
+  <rect width="600" height="760" fill="#f6f3ec"/>
+  <rect x="28" y="28" width="544" height="704" fill="none" stroke="#070707" stroke-width="12"/>
+  <circle cx="300" cy="270" r="112" fill="#ff3530" stroke="#070707" stroke-width="10"/>
+  <path d="M124 664c38-132 112-198 176-198s138 66 176 198" fill="#070707"/>
+  <text x="86" y="96" fill="#070707" font-family="Arial, sans-serif" font-size="30" font-weight="900" letter-spacing="6">HEROINES</text>
+</svg>

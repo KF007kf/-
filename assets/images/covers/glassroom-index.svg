@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="Glassroom Index cover placeholder">
+  <rect width="900" height="1200" fill="#e8e4da"/>
+  <rect x="70" y="70" width="760" height="1060" fill="#fff" stroke="#070707" stroke-width="14"/>
+  <path d="M140 170h620M140 260h620M140 350h620M140 440h620M140 530h620M140 620h620" stroke="#070707" stroke-width="4" opacity=".35"/>
+  <rect x="140" y="170" width="330" height="450" fill="#070707"/>
+  <rect x="502" y="170" width="258" height="450" fill="#ff3530"/>
+  <text x="132" y="780" fill="#070707" font-family="Georgia, serif" font-size="86" font-style="italic" font-weight="900">Glassroom</text>
+  <text x="132" y="880" fill="#ff3530" font-family="Arial, sans-serif" font-size="86" font-weight="900">INDEX</text>
+  <text x="132" y="1005" fill="#070707" font-family="Arial, sans-serif" font-size="34" font-weight="900" letter-spacing="6">CASE FILE / 8.2</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="After Rain Terminal cover placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6f3ec"/>
+      <stop offset="0.48" stop-color="#c9c4bb"/>
+      <stop offset="1" stop-color="#ff3530"/>
+    </linearGradient>
+    <pattern id="grid" width="54" height="54" patternUnits="userSpaceOnUse">
+      <path d="M54 0H0v54" fill="none" stroke="#070707" stroke-opacity=".18" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#g)"/>
+  <rect width="900" height="1200" fill="url(#grid)"/>
+  <rect x="64" y="72" width="772" height="1056" fill="none" stroke="#070707" stroke-width="14"/>
+  <rect x="112" y="142" width="676" height="330" fill="#070707"/>
+  <text x="138" y="250" fill="#fff" font-family="Georgia, serif" font-size="82" font-style="italic" font-weight="900">After Rain</text>
+  <text x="138" y="348" fill="#ff3530" font-family="Arial, sans-serif" font-size="78" font-weight="900">TERMINAL</text>
+  <path d="M122 720h656" stroke="#070707" stroke-width="12"/>
+  <path d="M122 780h430" stroke="#070707" stroke-width="12"/>
+  <circle cx="690" cy="830" r="96" fill="#ff3530" stroke="#070707" stroke-width="12"/>
+  <text x="646" y="852" fill="#fff" font-family="Arial, sans-serif" font-size="54" font-weight="900">8.7</text>
+  <text x="122" y="1042" fill="#070707" font-family="Arial, sans-serif" font-size="28" font-weight="900" letter-spacing="8">NTRGAME REVIEW</text>
+</svg>

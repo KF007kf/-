@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="Mercy Loop cover placeholder">
+  <rect width="900" height="1200" fill="#f6f3ec"/>
+  <circle cx="450" cy="500" r="310" fill="#ff3530" stroke="#070707" stroke-width="18"/>
+  <circle cx="450" cy="500" r="190" fill="#f6f3ec" stroke="#070707" stroke-width="12"/>
+  <text x="92" y="930" fill="#070707" font-family="Georgia, serif" font-size="104" font-style="italic" font-weight="900">Mercy</text>
+  <text x="92" y="1038" fill="#ff3530" font-family="Arial, sans-serif" font-size="100" font-weight="900">LOOP</text>
+</svg>

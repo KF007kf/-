@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReviewFork - Brutalist Editorial System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* 粗野主义滚动条 - 极简方正 */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #ffffff; border-left: 2px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #000000; border-radius: 0; }
+    ::-webkit-scrollbar-thumb:hover { background: #ff3530; }
+    
+    html { scroll-behavior: smooth; }
+    
+    /* 杂志排版对齐 */
+    .magazine-text {
+      text-justify: inter-character;
+      text-align: justify;
+      hyphens: auto;
+    }
+  </style>
+
+  <!-- Firebase 模块引入 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    window.firebaseAPI = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc, collection };
+    window.dispatchEvent(new Event('firebaseLoaded'));
+  </script>
+</head>
+<body class="bg-white text-black font-sans selection:bg-[#ff3530] selection:text-white pb-20">
+
+  <!-- 顶部导航：去除一切阴影和模糊，只留硬线条 -->
+  <nav class="border-b-4 border-black py-4 px-6 flex items-center justify-between sticky top-0 bg-white z-30">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 bg-[#ff3530] flex items-center justify-center text-white font-black text-sm border-2 border-black">P</div>
+      <span class="font-serif italic font-black text-2xl tracking-tighter uppercase">ReviewFork</span>
+      <span id="cloud-status" class="ml-4 text-[10px] font-bold tracking-widest uppercase px-2 py-1 border border-black bg-gray-100 hidden">
+          <i data-lucide="cloud-off" class="w-3 h-3 inline-block -mt-0.5"></i> OFFLINE
+      </span>
+    </div>
+    
+    <div class="flex border-2 border-black p-0.5 bg-white" id="mode-toggles">
+      <button onclick="setMode('upcoming')" id="btn-mode-upcoming" class="px-4 py-1.5 text-xs font-bold uppercase tracking-widest transition-all bg-black text-white active:scale-95 border-l-2 border-transparent">
+        UPCOMING / 前瞻
+      </button>
+    </div>
+  </nav>
+
+  <main class="max-w-[1800px] mx-auto px-6 mt-8 flex flex-col xl:flex-row gap-10 items-start">
+    
+    <!-- ================= 左侧：编辑控制台 ================= -->
+    <div class="w-full xl:w-[460px] shrink-0 bg-white p-6 border-4 border-black sticky top-24 overflow-y-auto" style="max-height: calc(100vh - 120px);">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b-4 border-black">
+        <h2 class="font-serif italic font-black text-2xl tracking-tighter uppercase">EDITOR PANEL / 编辑台</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <div id="form-upcoming" class="block space-y-5">
+          <div class="p-4 bg-[#ff3530] text-white border-2 border-black mb-4">
+            <span class="text-xs font-bold uppercase tracking-widest block mb-1">Brutalist NTR Mode</span>
+            <span class="text-[11px] leading-tight block">Active: S/A Rank VFX, Cloud Auto-Save, Smart Data Highlights.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-black uppercase tracking-widest mb-1.5">ISSUE HEADLINE / 期刊主标</label>
+            <input type="text" id="upcomingTitle" oninput="handleUpcomingTitle(this.value)" class="w-full px-4 py-3 bg-white border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#ff3530] transition-none text-sm font-bold rounded-none" />
+          </div>
+          
+          <div class="border-t-4 border-black pt-5 mt-2">
+            <div class="flex items-center justify-between mb-4">
+              <label class="block text-xs font-bold text-black uppercase tracking-widest">MONTH WINDOWS / 档期编排</label>
+            </div>
+            
+            <div id="upcoming-items-container" class="space-y-12">
+              <!-- JS动态渲染: 月份及其内部的作品 -->
+            </div>
+
+            <!-- 全局添加月份按钮 -->
+            <button type="button" onclick="addUpcomingMonth()" class="w-full flex items-center justify-center gap-1.5 py-4 text-sm font-black uppercase tracking-widest text-white bg-black border-2 border-black hover:bg-[#ff3530] transition-colors active:scale-[0.98] mt-8 rounded-none">
+              <i data-lucide="folder-plus" class="w-4 h-4"></i> ADD NEW MONTH / 添加新月份档期
+            </button>
+          </div>
+        </div>
+        
+        <!-- 导出按钮 -->
+        <button type="button" id="btn-export" onclick="handleExport()" class="w-full py-5 font-black text-white uppercase tracking-[0.2em] text-sm flex items-center justify-center space-x-2 bg-[#ff3530] hover:bg-black border-2 border-black transition-colors active:scale-[0.98] rounded-none mt-10">
+          <i data-lucide="printer" class="w-5 h-5"></i>
+          <span id="export-text">RENDER ISSUE / 渲染期刊</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 右侧：Pitchfork 粗野主义排版区 ================= -->
+    <div class="flex-1 overflow-x-auto flex justify-center pb-12">
+      <!-- 极简白底，黑框，硬边缘 -->
+      <div id="export-node" class="w-[1000px] shrink-0 bg-white pt-16 pb-24 border-4 border-black mx-auto box-border relative overflow-hidden transition-all duration-300">
+        <!-- JS 动态注入排版 -->
+      </div>
+    </div>
+    
+  </main>
+
+  <script>
+    const trashIcon = `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>`;
+    const defaultPlaceholder = "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=600&q=80";
+
+    // 初始化核心数据 (默认状态)
+    const state = {
+      mode: 'upcoming', 
+      upcomingTitle: 'MOST ANTICIPATED RELEASES 2026 / 2026 年度最受期待新作',
+      upcomingMonths: [
+        {
+          id: 1,
+          monthName: '2026.10 / OCTOBER',
+          items: [
+            { 
+              id: 1, 
+              date: 'OCT 28, 2026 / 10月28日', 
+              title: '樱之刻 / Aetheria Echoes', 
+              developer: 'MAKURA STUDIO / 枕社', 
+              score: 'S', 
+              coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80', 
+              length: '50H+ / 超长篇',
+              cgCount: '120+ FILES / 120张以上',
+              sceneCount: '45+ SCENES / 45幕以上',
+              coreTags: 'NTR / 牛头人\nPHILOSOPHY / 哲学',
+              heroines: [
+                { id: 1, name: '神崎 凛 / Rin', attr: 'CHILDHOOD FRIEND / 青梅竹马', quote: '“即使世界线收束，我也会找到你。”', imgUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80' }
+              ],
+              targets: [
+                { id: 1, name: '【观测者】 OBSERVER', conflict: '掌握核心代码，试图重置整个虚拟空间。', imgUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80' }
+              ],
+              synopsis: '在经历了数年的跳票与沉淀后，SCA-自再次带着他庞大而深邃的美学世界降临。这不仅是一部作品，更像是一场业界的文艺复兴。剧本的每一处转折都如同手术刀般精准地剖开人性的内核。',
+            }
+          ]
+        }
+      ],
+      isExporting: false
+    };
+
+    // ==========================================
+    // 云端数据持久化模块 (Firebase Integration)
+    // ==========================================
+    let saveTimeout = null;
+
+    function notifyStateChanged() {
+      renderDynamicControls();
+      renderPreview();
+      
+      if (!window.currentUser || !window.firebaseAPI) return;
+      
+      const cloudStatus = document.getElementById('cloud-status');
+      if(cloudStatus) {
+        cloudStatus.innerHTML = `<i data-lucide="cloud-snow" class="w-3 h-3 inline-block -mt-0.5 animate-pulse"></i> SAVING...`;
+        lucide.createIcons();
+      }
+
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        try {
+          const { doc, setDoc, getFirestore } = window.firebaseAPI;
+          const db = getFirestore();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          // 修复：添加具体的文档 ID 'default' 使得路径段为偶数
+          const docRef = doc(db, 'artifacts', appId, 'users', window.currentUser.uid, 'appState', 'default');
+          
+          // 深度克隆剔除不能被Firestore保存的不可序列化对象
+          const stateToSave = JSON.parse(JSON.stringify(state)); 
+          await setDoc(docRef, stateToSave);
+          
+          if(cloudStatus) {
+             cloudStatus.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3 inline-block -mt-0.5 text-green-600"></i> SAVED`;
+             lucide.createIcons();
+          }
+        } catch (err) {
+          console.error("Firebase Sync Error: ", err);
+        }
+      }, 1500); // 1.5s 防抖，保护云端数据库
+    }
+
+    async function loadStateFromFirestore() {
+      if (!window.currentUser || !window.firebaseAPI) return;
+      try {
+        const { doc, getDoc, getFirestore } = window.firebaseAPI;
+        const db = getFirestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // 修复：添加具体的文档 ID 'default' 使得路径段为偶数
+        const docRef = doc(db, 'artifacts', appId, 'users', window.currentUser.uid, 'appState', 'default');
+        
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const loadedState = docSnap.data();
+          Object.assign(state, loadedState);
+          
+          const cloudStatus = document.getElementById('cloud-status');
+          if(cloudStatus) {
+            cloudStatus.innerHTML = `<i data-lucide="cloud" class="w-3 h-3 inline-block -mt-0.5 text-blue-600"></i> SYNCED`;
+            cloudStatus.classList.remove('hidden');
+            lucide.createIcons();
+          }
+
+          document.getElementById('upcomingTitle').value = state.upcomingTitle;
+          renderDynamicControls();
+          renderPreview();
+        }
+      } catch (err) {
+        console.error("Firebase Load Error: ", err);
+      }
+    }
+
+    window.addEventListener('firebaseLoaded', async () => {
+        if (typeof __firebase_config === 'undefined') return;
+        try {
+            const config = JSON.parse(__firebase_config);
+            const app = window.firebaseAPI.initializeApp(config);
+            const auth = window.firebaseAPI.getAuth(app);
+            
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await window.firebaseAPI.signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await window.firebaseAPI.signInAnonymously(auth);
+            }
+
+            window.firebaseAPI.onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    window.currentUser = user;
+                    loadStateFromFirestore();
+                }
+            });
+        } catch (e) {
+            console.error("Firebase init failed", e);
+        }
+    });
+
+    // ==========================================
+    // 图片 Base64 极致压缩模块 (解决 1MB 云端限制)
+    // ==========================================
+    async function compressImage(file, maxSize = 1000) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > height && width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            // 将其极速压缩为 JPEG (80% 品质)，确保能在 Firestore 流畅存取
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+
+    // ==========================================
+    // 编辑器数据交互绑定
+    // ==========================================
+    function setMode(mode) {
+        state.mode = mode;
+        document.getElementById('upcomingTitle').value = state.upcomingTitle;
+        notifyStateChanged();
+    }
+
+    window.handleUpcomingTitle = (val) => {
+      state.upcomingTitle = val;
+      notifyStateChanged();
+    };
+
+    function findItemContext(itemId) {
+      for (const m of state.upcomingMonths) {
+        const item = m.items.find(i => i.id === itemId);
+        if (item) return { month: m, item: item };
+      }
+      return null;
+    }
+
+    function getNextItemId() {
+      let maxId = 0;
+      state.upcomingMonths.forEach(m => {
+        m.items.forEach(i => { if (i.id > maxId) maxId = i.id; });
+      });
+      return maxId + 1;
+    }
+
+    window.addUpcomingMonth = () => {
+      const newId = state.upcomingMonths.length > 0 ? Math.max(...state.upcomingMonths.map(m => m.id)) + 1 : 1;
+      state.upcomingMonths.push({
+        id: newId, monthName: 'NEW WINDOW / 新增月份', items: []
+      });
+      notifyStateChanged();
+    };
+    
+    window.removeUpcomingMonth = (id) => {
+      state.upcomingMonths = state.upcomingMonths.filter(m => m.id !== id);
+      notifyStateChanged();
+    };
+
+    window.updateUpcomingMonth = (id, val) => {
+      const m = state.upcomingMonths.find(m => m.id === id);
+      if (m) { m.monthName = val; notifyStateChanged(); }
+    };
+
+    window.addUpcomingItem = (monthId) => {
+      const m = state.upcomingMonths.find(m => m.id === monthId);
+      if (m) {
+        const newId = getNextItemId();
+        m.items.push({
+          id: newId, date: 'JAN 01, 2027 / 2027年1月1日', title: 'UNTITLED / 未命名', developer: 'UNKNOWN DEV / 未知社团', score: 'A',
+          coverUrl: defaultPlaceholder, length: '20H+ / 短篇', cgCount: '50+ / 50张', sceneCount: '15+ / 15幕', coreTags: 'NTR / 牛头人',
+          heroines: [{ id: 1, name: 'NAME / 姓名', attr: 'ATTR / 属性', quote: '“...”', imgUrl: defaultPlaceholder }],
+          targets: [], synopsis: 'Enter your brutal editorial review here / 请在此输入冷峻排版的简评。'
+        });
+        notifyStateChanged();
+      }
+    };
+
+    window.removeUpcomingItem = (itemId) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.month.items = ctx.month.items.filter(i => i.id !== itemId);
+        notifyStateChanged();
+      }
+    };
+
+    window.handleUpcomingChange = (itemId, field, value) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.item[field] = value;
+        // 因为这是高频打字事件，只 renderPreview 保持输入流畅，同步云端已在 notify 做了防抖
+        renderPreview();
+        notifyStateChanged();
+      }
+    };
+
+    window.handleUpcomingImageUpload = async (itemId, e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const base64Url = await compressImage(file);
+        const ctx = findItemContext(itemId);
+        if(ctx) {
+          ctx.item.coverUrl = base64Url;
+          notifyStateChanged();
+        }
+      }
+    };
+
+    window.addHeroine = (itemId) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        const newId = ctx.item.heroines.length > 0 ? Math.max(...ctx.item.heroines.map(h => h.id)) + 1 : 1;
+        ctx.item.heroines.push({ id: newId, name: 'Name / 姓名', attr: 'ATTR / 属性', quote: '“Quote / 台词”', imgUrl: defaultPlaceholder });
+        notifyStateChanged();
+      }
+    };
+    window.removeHeroine = (itemId, hId) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.item.heroines = ctx.item.heroines.filter(h => h.id !== hId);
+        notifyStateChanged();
+      }
+    };
+    window.updateHeroine = (itemId, hId, field, value) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.item.heroines = ctx.item.heroines.map(h => h.id === hId ? { ...h, [field]: value } : h);
+        renderPreview(); notifyStateChanged();
+      }
+    };
+    window.uploadHeroineImg = async (itemId, hId, e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const base64Url = await compressImage(file);
+        const ctx = findItemContext(itemId);
+        if(ctx) {
+          ctx.item.heroines = ctx.item.heroines.map(h => h.id === hId ? { ...h, imgUrl: base64Url } : h);
+          notifyStateChanged();
+        }
+      }
+    };
+
+    window.addTarget = (itemId) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        const newId = ctx.item.targets.length > 0 ? Math.max(...ctx.item.targets.map(t => t.id)) + 1 : 1;
+        ctx.item.targets.push({ id: newId, name: 'TARGET / 代号', conflict: 'Conflict Info / 冲突信息', imgUrl: defaultPlaceholder });
+        notifyStateChanged();
+      }
+    };
+    window.removeTarget = (itemId, tId) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.item.targets = ctx.item.targets.filter(t => t.id !== tId);
+        notifyStateChanged();
+      }
+    };
+    window.updateTarget = (itemId, tId, field, value) => {
+      const ctx = findItemContext(itemId);
+      if(ctx) {
+        ctx.item.targets = ctx.item.targets.map(t => t.id === tId ? { ...t, [field]: value } : t);
+        renderPreview(); notifyStateChanged();
+      }
+    };
+    window.uploadTargetImg = async (itemId, tId, e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const base64Url = await compressImage(file);
+        const ctx = findItemContext(itemId);
+        if(ctx) {
+          ctx.item.targets = ctx.item.targets.map(t => t.id === tId ? { ...t, imgUrl: base64Url } : t);
+          notifyStateChanged();
+        }
+      }
+    };
+
+    function renderDynamicControls() {
+      const upcomingHtml = state.upcomingMonths.map((month) => {
+        
+        const itemsHtml = month.items.map((item) => {
+          const heroinesUI = item.heroines.map(h => `
+            <div class="border-2 border-black p-2 bg-white relative group mb-2">
+              <button type="button" onclick="removeHeroine(${item.id}, ${h.id})" class="absolute top-1 right-1 text-white bg-black hover:bg-[#ff3530] p-1 border border-black hidden group-hover:block z-10">${trashIcon}</button>
+              <div class="flex gap-2">
+                <div class="w-[60px] min-h-[60px] shrink-0 border-2 border-black cursor-pointer overflow-hidden relative flex justify-center items-center bg-gray-100" onclick="document.getElementById('h-img-${item.id}-${h.id}').click()">
+                  <img src="${h.imgUrl}" class="w-full h-auto object-contain grayscale hover:grayscale-0 transition-all" />
+                  <input type="file" id="h-img-${item.id}-${h.id}" class="hidden" accept="image/*" onchange="uploadHeroineImg(${item.id}, ${h.id}, event)" />
+                </div>
+                <div class="flex-1 flex flex-col gap-1 justify-center">
+                  <input type="text" value="${h.name}" oninput="updateHeroine(${item.id}, ${h.id}, 'name', this.value)" placeholder="Name / 姓名" class="w-full text-[10px] font-bold p-1 border border-black focus:outline-none focus:border-[#ff3530]" />
+                  <input type="text" value="${h.attr}" oninput="updateHeroine(${item.id}, ${h.id}, 'attr', this.value)" placeholder="Attribute / 属性" class="w-full text-[10px] p-1 border border-black focus:outline-none focus:border-[#ff3530]" />
+                  <input type="text" value="${h.quote}" oninput="updateHeroine(${item.id}, ${h.id}, 'quote', this.value)" placeholder="Quote / 台词" class="w-full text-[10px] p-1 border border-black focus:outline-none focus:border-[#ff3530]" />
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          const targetsUI = item.targets.map(t => `
+            <div class="border-2 border-black p-2 bg-white relative group mb-2">
+              <button type="button" onclick="removeTarget(${item.id}, ${t.id})" class="absolute top-1 right-1 text-white bg-black hover:bg-[#ff3530] p-1 border border-black hidden group-hover:block z-10">${trashIcon}</button>
+              <div class="flex gap-2">
+                <div class="w-[60px] min-h-[60px] shrink-0 border-2 border-black cursor-pointer overflow-hidden relative flex justify-center items-center bg-gray-100" onclick="document.getElementById('t-img-${item.id}-${t.id}').click()">
+                  <img src="${t.imgUrl}" class="w-full h-auto object-contain grayscale hover:grayscale-0 transition-all" />
+                  <input type="file" id="t-img-${item.id}-${t.id}" class="hidden" accept="image/*" onchange="uploadTargetImg(${item.id}, ${t.id}, event)" />
+                </div>
+                <div class="flex-1 flex flex-col gap-1 justify-center">
+                  <input type="text" value="${t.name}" oninput="updateTarget(${item.id}, ${t.id}, 'name', this.value)" placeholder="Target ID / 代号" class="w-full text-[10px] font-bold p-1 border border-black focus:outline-none focus:border-[#ff3530]" />
+                  <textarea oninput="updateTarget(${item.id}, ${t.id}, 'conflict', this.value)" placeholder="Conflict / 冲突设定" class="w-full text-[10px] p-1 border border-black focus:outline-none focus:border-[#ff3530] resize-y h-[46px] leading-tight">${t.conflict}</textarea>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          return `
+          <div class="bg-gray-100 border-2 border-black p-3 relative flex flex-col gap-3 group rounded-none mb-4">
+            <button type="button" onclick="removeUpcomingItem(${item.id})" class="absolute -top-3 -right-3 text-white bg-black hover:bg-[#ff3530] border-2 border-black rounded-none p-1 transition-all z-10">${trashIcon}</button>
+            
+            <div class="w-full h-[160px] shrink-0 bg-white border-2 border-black cursor-pointer relative overflow-hidden group/img" onclick="document.getElementById('up-img-${item.id}').click()">
+               <img src="${item.coverUrl}" class="w-full h-full object-contain grayscale" />
+               <div class="absolute inset-0 bg-black/60 hidden group-hover/img:flex items-center justify-center text-white text-[12px] font-bold tracking-widest uppercase transition-all">REPLACE COVER / 替换大图</div>
+               <input type="file" id="up-img-${item.id}" class="hidden" accept="image/*" onchange="handleUpcomingImageUpload(${item.id}, event)" />
+            </div>
+            
+            <div class="grid grid-cols-1 gap-2">
+               <div><label class="text-[9px] text-[#ff3530] font-bold uppercase tracking-widest block mb-0.5">DATE / 预计发售日</label><input type="text" value="${item.date}" oninput="handleUpcomingChange(${item.id}, 'date', this.value)" class="w-full p-2 bg-white text-xs font-bold border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none uppercase" /></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">TITLE / 作品名</label><input type="text" value="${item.title}" oninput="handleUpcomingChange(${item.id}, 'title', this.value)" class="w-full p-2 bg-white text-sm font-bold border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none" /></div>
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">STUDIO / 制作社</label><input type="text" value="${item.developer}" oninput="handleUpcomingChange(${item.id}, 'developer', this.value)" class="w-full p-2 bg-white text-xs border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none uppercase" /></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+               <div><label class="text-[9px] text-[#ff3530] font-bold uppercase tracking-widest block mb-0.5">SCORE / 期待值 (S/A有特效)</label><input type="text" value="${item.score}" oninput="handleUpcomingChange(${item.id}, 'score', this.value)" class="w-full p-2 bg-white text-xs font-bold border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none uppercase" /></div>
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">TAGS / 标签 (换行)</label><textarea oninput="handleUpcomingChange(${item.id}, 'coreTags', this.value)" class="w-full p-1 bg-white text-[10px] border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none h-[34px] uppercase resize-none leading-tight">${item.coreTags}</textarea></div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2">
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">HOURS</label><input type="text" value="${item.length}" oninput="handleUpcomingChange(${item.id}, 'length', this.value)" class="w-full p-1.5 bg-white text-[10px] border-2 border-black rounded-none uppercase" /></div>
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">CG AMT</label><input type="text" value="${item.cgCount}" oninput="handleUpcomingChange(${item.id}, 'cgCount', this.value)" class="w-full p-1.5 bg-white text-[10px] border-2 border-black rounded-none uppercase" /></div>
+               <div><label class="text-[9px] text-black font-bold uppercase tracking-widest block mb-0.5">H-SCENE</label><input type="text" value="${item.sceneCount}" oninput="handleUpcomingChange(${item.id}, 'sceneCount', this.value)" class="w-full p-1.5 bg-white text-[10px] border-2 border-black rounded-none uppercase" /></div>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t-2 border-black">
+               <div class="flex justify-between items-end mb-2">
+                 <label class="text-[10px] text-[#ff3530] font-bold uppercase tracking-widest block">HEROINES / 女主一览</label>
+                 <button onclick="addHeroine(${item.id})" class="text-[9px] bg-black text-white px-2 py-1 font-bold border border-black hover:bg-[#ff3530]">+ ADD</button>
+               </div>
+               <div>${heroinesUI}</div>
+            </div>
+            
+            <div class="mt-1 pt-2 border-t border-dashed border-gray-400">
+               <div class="flex justify-between items-end mb-2">
+                 <label class="text-[10px] text-black font-bold uppercase tracking-widest block">TARGETS / 间男一览</label>
+                 <button onclick="addTarget(${item.id})" class="text-[9px] bg-black text-white px-2 py-1 font-bold border border-black hover:bg-[#ff3530]">+ ADD</button>
+               </div>
+               <div>${targetsUI}</div>
+            </div>
+
+            <div class="mt-2 pt-2 border-t-2 border-black">
+               <label class="text-[10px] text-black font-bold uppercase tracking-widest block mb-1">REVIEW / 评测简评</label>
+               <textarea oninput="handleUpcomingChange(${item.id}, 'synopsis', this.value)" class="w-full p-2 text-[11px] border-2 border-black focus:outline-none focus:border-[#ff3530] rounded-none resize-y h-20 bg-white leading-relaxed font-serif">${item.synopsis}</textarea>
+            </div>
+          </div>
+        `;
+        }).join('');
+
+        return `
+          <div class="border-4 border-black bg-white p-4 pt-4 relative">
+            <button type="button" onclick="removeUpcomingMonth(${month.id})" class="absolute -top-3 -right-3 text-white bg-black hover:bg-[#ff3530] border-2 border-black rounded-none p-1 transition-all z-10" title="删除该月份">${trashIcon}</button>
+            
+            <div class="bg-black p-3 -mt-4 -mx-4 mb-4 shadow-[4px_4px_0px_0px_rgba(255,53,48,1)] border-b-2 border-black relative z-0">
+               <label class="text-[11px] text-[#ff3530] font-black uppercase tracking-widest block mb-1">MONTH WINDOW / 档期主标题</label>
+               <input type="text" value="${month.monthName}" oninput="updateUpcomingMonth(${month.id}, this.value)" class="w-full p-2 bg-white text-sm font-black border-2 border-black focus:outline-none focus:border-[#ff3530] uppercase" placeholder="e.g. 2026.10 / OCTOBER" />
+            </div>
+
+            <div class="space-y-4">
+               ${itemsHtml}
+            </div>
+
+            <button type="button" onclick="addUpcomingItem(${month.id})" class="w-full py-3 bg-white border-2 border-black font-black text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-colors mt-4">
+              <i data-lucide="file-plus" class="w-4 h-4 inline-block -mt-0.5"></i> ADD ENTRY / 在此月份添加作品
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('upcoming-items-container').innerHTML = upcomingHtml;
+      lucide.createIcons();
+    }
+
+    function renderPreview() {
+      const exportNode = document.getElementById('export-node');
+      
+      let listHtml = '';
+
+      for (const month of state.upcomingMonths) {
+        listHtml += `
+          <div class="border-y-8 border-black bg-black py-12 px-12 mb-28 mt-10 relative">
+            <div class="absolute -top-7 left-12 bg-[#ff3530] text-black px-6 py-2 border-4 border-black font-sans font-black text-2xl tracking-[0.3em] uppercase transform -skew-x-12">
+              <span class="skew-x-12 block">RELEASE WINDOW</span>
+            </div>
+            <h2 class="font-sans font-black text-[6rem] leading-[0.9] tracking-tighter uppercase mt-6 text-[#ff3530]" style="word-break: break-word;">
+                ${month.monthName.replace(' / ', '<br/><span class="text-[4.5rem] text-[#ff3530] opacity-80">')}</span>
+            </h2>
+          </div>
+        `;
+
+        listHtml += month.items.map((item) => {
+          // 🌸 女主列阵
+          const heroinesHtml = item.heroines.length > 0 ? `
+            <div class="mt-20 pt-16 border-t-8 border-black relative">
+              <div class="absolute -top-6 left-0 bg-[#ff3530] text-white px-6 py-2 font-sans font-black text-2xl tracking-[0.25em] uppercase border-4 border-black">
+                Heroines Directory / 女主一览
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 items-start">
+                ${item.heroines.map((h) => `
+                  <div class="flex flex-col group cursor-pointer h-full">
+                    <div class="w-full border-4 border-black group-hover:border-[6px] transition-all duration-100 overflow-hidden bg-gray-100 mb-6 flex justify-center items-center">
+                      <img src="${h.imgUrl}" class="w-full h-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300 transform group-hover:scale-105" crossorigin="anonymous" />
+                    </div>
+                    <h4 class="font-sans font-black uppercase tracking-widest text-3xl text-black border-b-4 border-black pb-3 mb-4 leading-tight">${h.name}</h4>
+                    <p class="text-[#ff3530] text-base font-black tracking-[0.2em] uppercase mb-4">${h.attr}</p>
+                    <p class="font-serif italic text-xl leading-snug text-gray-800 flex-1">${h.quote}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : '';
+
+          // ⚠️ 间男列阵
+          const targetsHtml = item.targets.length > 0 ? `
+            <div class="mt-20 pt-16 border-t-8 border-black relative">
+              <div class="absolute -top-6 left-0 bg-black text-white px-6 py-2 font-sans font-black text-2xl tracking-[0.25em] uppercase border-4 border-black">
+                Targets & Antagonists / 间男一览
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 items-start">
+                ${item.targets.map((t) => `
+                  <div class="flex flex-col group cursor-pointer h-full">
+                    <div class="w-full border-4 border-black group-hover:border-[6px] transition-all duration-100 overflow-hidden bg-gray-100 mb-6 flex justify-center items-center">
+                      <img src="${t.imgUrl}" class="w-full h-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300 transform group-hover:scale-105" crossorigin="anonymous" />
+                    </div>
+                    <h4 class="font-sans font-black uppercase tracking-widest text-3xl text-black group-hover:text-[#ff3530] border-b-4 border-black pb-3 mb-4 leading-tight transition-colors">${t.name}</h4>
+                    <p class="font-serif text-xl leading-relaxed text-gray-800 flex-1">${t.conflict}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : '';
+
+          // 智能监控：CG/场景红线警告
+          const cgNum = parseInt((item.cgCount.match(/\d+/) || [0])[0], 10);
+          const sceneNum = parseInt((item.sceneCount.match(/\d+/) || [0])[0], 10);
+          const cgColorClass = cgNum > 70 ? 'text-[#ff3530]' : 'text-black';
+          const sceneColorClass = sceneNum > 80 ? 'text-[#ff3530]' : 'text-black';
+
+          // 恢复最初的纯粹红圈粗野主义评分设计，剥夺一切等级特权特效
+          const ratingBadgeHtml = `
+             <div class="w-48 h-48 md:w-52 md:h-52 rounded-full bg-[#ff3530] text-white flex flex-col items-center justify-center border-[6px] border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transform hover:-translate-y-1 hover:scale-105 transition-transform shrink-0">
+                <span class="font-sans text-sm uppercase tracking-[0.25em] font-black mb-2">RATING / 期待值</span>
+                <span class="font-sans text-[4.5rem] font-black tracking-tighter leading-none">${item.score}</span>
+             </div>
+          `;
+
+          // 椭圆红色标签药丸
+          const tagsHtml = (item.coreTags || '').split('\n').filter(t => t.trim() !== '').map((t) => {
+            return `<span class="inline-block bg-[#ff3530] text-white border-2 border-black rounded-full px-4 py-1.5 mr-2 mb-2 text-[11px] font-black tracking-widest uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transform hover:-translate-y-0.5 transition-transform whitespace-nowrap">${t.trim()}</span>`;
+          }).join('');
+
+          return `
+            <!-- 单个评测卡片区块 -->
+            <div class="mb-32 px-12 relative">
+              
+              <div class="flex flex-row justify-between items-end gap-8 mb-10 border-b-8 border-black pb-10 w-full">
+                  
+                  <div class="flex-1 min-w-0 flex flex-col gap-6">
+                      <!-- 超大发售日期标签 -->
+                      <div class="inline-flex items-center gap-4 bg-white text-black border-4 border-black px-6 py-3 w-max shadow-[8px_8px_0px_0px_rgba(255,53,48,1)] mb-2 relative z-10">
+                         <i data-lucide="calendar" class="w-10 h-10 text-[#ff3530]"></i>
+                         <span class="font-sans font-black uppercase tracking-[0.15em] text-4xl">ETA // ${item.date}</span>
+                      </div>
+                      
+                      <span class="font-sans font-black uppercase tracking-[0.2em] text-3xl text-gray-500 mt-2">DEV / ${item.developer}</span>
+                      
+                      <!-- 标题字号 -->
+                      <h2 class="font-serif font-black italic text-[5rem] leading-[0.95] tracking-tighter text-black uppercase mt-4" style="word-break: break-word;">
+                        ${item.title.replace(' / ', '<br/><span class="text-[3.5rem] text-gray-800">')}</span>
+                      </h2>
+                  </div>
+
+                  <!-- 恢复经典的红圈评分徽章 -->
+                  <div class="shrink-0 pb-4 pr-6 pl-4">
+                      ${ratingBadgeHtml}
+                  </div>
+              </div>
+
+              <!-- KV 锐利大图 -->
+              <div class="w-full border-[6px] border-black mb-8 bg-gray-100 overflow-hidden relative group">
+                  <img src="${item.coverUrl}" class="w-full h-auto max-h-[800px] object-contain grayscale group-hover:grayscale-0 transition-all duration-500 bg-white" crossorigin="anonymous" />
+                  <div class="absolute inset-0 ring-[6px] ring-inset ring-black pointer-events-none"></div>
+              </div>
+
+              <!-- 粗野主义参数网格 (条件变色激活) -->
+              <div class="grid grid-cols-4 border-y-8 border-black py-8 mb-12 font-sans font-black uppercase tracking-widest text-center divide-x-4 divide-black items-center">
+                  <div class="flex flex-col gap-3 px-2">
+                      <span class="text-gray-500 text-base">LENGTH / 时长</span>
+                      <span class="text-3xl text-black leading-tight">${item.length.replace(' / ', '<br/>')}</span>
+                  </div>
+                  <div class="flex flex-col gap-3 px-2">
+                      <span class="text-gray-500 text-base">CG FILES / 图像数</span>
+                      <span class="text-3xl ${cgColorClass} leading-tight">${item.cgCount.replace(' / ', '<br/>')}</span>
+                  </div>
+                  <div class="flex flex-col gap-3 px-2">
+                      <span class="text-gray-500 text-base">H-SCENES / 场景数</span>
+                      <span class="text-3xl ${sceneColorClass} leading-tight">${item.sceneCount.replace(' / ', '<br/>')}</span>
+                  </div>
+                  <div class="flex flex-col gap-3 px-4 justify-center items-center">
+                      <span class="text-sm text-gray-500 mb-1">TAGS / 标签</span>
+                      <div class="flex flex-wrap justify-center items-center w-full mt-1">
+                          ${tagsHtml}
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 正文评测 -->
+              <div class="font-serif text-[2rem] leading-[1.9] text-black magazine-text pl-10 border-l-[8px] border-[#ff3530] max-w-5xl">
+                  ${item.synopsis}
+              </div>
+
+              <!-- 角色画廊网络 -->
+              ${heroinesHtml}
+              ${targetsHtml}
+
+            </div>
+          `;
+        }).join('');
+      }
+
+      exportNode.innerHTML = `
+        <div class="px-12 mb-20">
+            <div class="border-b-8 border-black pb-6 mb-6 flex justify-between items-end">
+                <span class="font-sans font-black text-[#ff3530] uppercase tracking-[0.3em] text-2xl">NTR GAME EDITORIAL / NTR游戏特刊</span>
+                <span class="font-sans font-black text-black uppercase tracking-widest text-xl">ISSUE VOL. 2026</span>
+            </div>
+            <h1 class="font-serif font-black text-[5.5rem] leading-[0.85] tracking-tighter text-black uppercase" style="word-break: break-word;">
+                ${state.upcomingTitle.replace(' / ', '<br/><span class="text-[4rem] text-gray-800">')}</span>
+            </h1>
+        </div>
+
+        <div class="mx-auto">
+            ${listHtml}
+        </div>
+      `;
+      
+      setTimeout(() => { if(window.lucide) window.lucide.createIcons({ root: document.getElementById('export-node') }); }, 0);
+    }
+
+    async function handleExport() {
+      if (state.isExporting) return;
+      const exportBtn = document.getElementById('btn-export');
+      const exportText = document.getElementById('export-text');
+      const exportNode = document.getElementById('export-node');
+      
+      state.isExporting = true;
+      const originalBg = exportBtn.className;
+      exportBtn.className = 'w-full py-5 font-black text-white uppercase tracking-[0.2em] text-sm flex items-center justify-center space-x-2 bg-gray-400 border-2 border-black cursor-wait rounded-none mt-10';
+      exportText.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i><span>RENDERING...</span>';
+      
+      const restoreQueue = [];
+      exportNode.querySelectorAll('*').forEach(el => {
+          const style = window.getComputedStyle(el);
+          if ((el.offsetWidth === 0 || el.offsetHeight === 0 || el.clientWidth === 0 || el.clientHeight === 0) && style.backgroundImage !== 'none') {
+              restoreQueue.push({ el, origBg: el.style.backgroundImage });
+              el.style.backgroundImage = 'none';
+          }
+      });
+
+      await new Promise(r => setTimeout(r, 200));
+
+      try {
+        const canvas = await html2canvas(exportNode, { 
+            useCORS: true, 
+            scale: 2, 
+            backgroundColor: '#ffffff', 
+            logging: false,
+            allowTaint: true
+        });
+        const link = document.createElement('a');
+        link.download = `NTR_ISSUE_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('RENDER FAILED. CHECK CONSOLE.');
+        console.error('html2canvas error:', err);
+      } finally {
+        restoreQueue.forEach(item => {
+            if (item.origBg !== undefined) item.el.style.backgroundImage = item.origBg;
+        });
+
+        state.isExporting = false;
+        exportBtn.className = originalBg;
+        exportText.innerText = 'RENDER ISSUE / 渲染期刊';
+        lucide.createIcons();
+      }
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      setMode('upcoming'); 
+    };
+  </script>
+</body>
+</html>

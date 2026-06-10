@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="ReviewFork logo">
+  <rect width="120" height="120" fill="#ff3530"/>
+  <rect x="8" y="8" width="104" height="104" fill="none" stroke="#070707" stroke-width="8"/>
+  <path d="M25 30h38c17 0 28 10 28 25 0 11-6 19-16 23l20 24H72L55 81h-9v21H25V30zm21 18v16h15c6 0 10-3 10-8s-4-8-10-8H46z" fill="#fff"/>
+  <path d="M18 103h84" stroke="#070707" stroke-width="8"/>
+</svg>

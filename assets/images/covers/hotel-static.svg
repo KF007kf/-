@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="Hotel Static cover placeholder">
+  <rect width="900" height="1200" fill="#070707"/>
+  <rect x="78" y="78" width="744" height="1044" fill="#f6f3ec" stroke="#ff3530" stroke-width="16"/>
+  <path d="M150 200h600M150 280h600M150 360h600M150 440h600M150 520h600" stroke="#070707" stroke-width="8"/>
+  <rect x="150" y="620" width="600" height="230" fill="#ff3530" stroke="#070707" stroke-width="8"/>
+  <text x="132" y="966" fill="#070707" font-family="Georgia, serif" font-size="92" font-style="italic" font-weight="900">Hotel</text>
+  <text x="132" y="1062" fill="#ff3530" font-family="Arial, sans-serif" font-size="82" font-weight="900">STATIC</text>
+</svg>

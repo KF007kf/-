@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-label="Antagonist placeholder">
+  <rect width="600" height="760" fill="#070707"/>
+  <rect x="28" y="28" width="544" height="704" fill="none" stroke="#ff3530" stroke-width="12"/>
+  <circle cx="300" cy="282" r="116" fill="#f6f3ec" stroke="#ff3530" stroke-width="10"/>
+  <path d="M104 674c44-142 122-214 196-214s152 72 196 214" fill="#ff3530"/>
+  <text x="70" y="96" fill="#f6f3ec" font-family="Arial, sans-serif" font-size="28" font-weight="900" letter-spacing="5">ANTAGONIST</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-label="Velvet Household cover placeholder">
+  <rect width="900" height="1200" fill="#f6f3ec"/>
+  <path d="M0 0h900v1200H0z" fill="#fff" opacity=".55"/>
+  <rect x="52" y="52" width="796" height="1096" fill="none" stroke="#070707" stroke-width="12"/>
+  <rect x="92" y="92" width="716" height="360" fill="#ff3530" stroke="#070707" stroke-width="8"/>
+  <text x="116" y="225" fill="#fff" font-family="Georgia, serif" font-size="80" font-style="italic" font-weight="900">Velvet</text>
+  <text x="116" y="324" fill="#070707" font-family="Arial, sans-serif" font-size="72" font-weight="900">HOUSEHOLD</text>
+  <rect x="112" y="548" width="676" height="360" fill="#070707"/>
+  <path d="M176 662h548M176 744h384M176 826h488" stroke="#f6f3ec" stroke-width="14"/>
+  <circle cx="682" cy="978" r="76" fill="#ff3530" stroke="#070707" stroke-width="10"/>
+  <text x="645" y="998" fill="#fff" font-family="Arial, sans-serif" font-size="43" font-weight="900">7.9</text>
+</svg>
