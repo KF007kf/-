@@ -87,7 +87,7 @@ Use `intensity: 0.5` for calmer motion, or `enabled: false` to disable GSAP anim
 
 ## Reviews
 
-Each review object controls one card and one article modal:
+Each review object controls one card and one article modal. The current NTRGAME review structure supports the same blocks as your long images:
 
 ```js
 {
@@ -95,14 +95,42 @@ Each review object controls one card and one article modal:
   title: "My Game",
   titleCn: "我的游戏",
   studio: "Studio Name",
-  cover: "./assets/images/covers/my-game.svg",
+  cover: "./assets/images/user-reviews/my-game-thumb.jpg",
+  displayCover: "./assets/images/user-reviews/my-game-display.jpg",
+  poster: "./assets/images/user-reviews/my-game.png",
   rating: 8.4,
+  radarTotal: "8.36",
+  sourceStatus: "以站内测评图为准",
   tags: ["剧情", "长篇"],
+  specs: {
+    length: "短篇",
+    cg: "52张",
+    scenes: "10个",
+    animated: "部分有",
+    voiced: "有配音",
+    gallery: "有"
+  },
+  scores: [
+    { label: "剧情", value: 7.0, note: "这一项的短评。" }
+  ],
+  directories: {
+    heroines: [{ name: "女主名", role: "妻子", portrait: "./assets/images/characters/placeholder-heroine.svg", comment: "人物短评。" }],
+    antagonists: [{ name: "同男名", role: "同男", portrait: "./assets/images/characters/placeholder-antagonist.svg", comment: "人物短评。" }]
+  },
   body: ["第一段", "第二段"]
 }
 ```
 
-Use unique `slug` values.
+Use unique `slug` values. `cover` is for homepage cards, `displayCover` is for the article, and `poster` is the original long layout image.
+
+## Writing Style
+
+The site is set up for a strong personal review voice, not neutral product copy. A useful pattern is:
+
+- Start with a direct verdict, for example "短但成型", "罐头但能卖", "起飞不能".
+- Use concrete structure first: specs, tags, characters, radar scores.
+- Let the long review say what you really think, including社团习惯、同类对比、值不值得玩.
+- Keep unknown release data marked in `sourceStatus` instead of inventing it.
 
 ## Polls
 

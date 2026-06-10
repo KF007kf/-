@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ReviewFork NTRGAME - 成人向游戏测评档案</title>
+    <title>NTRGAME REVIEW - 牛油测评与前瞻档案</title>
     <meta
       name="description"
-      content="Pitchfork-inspired adult game review blog for NTR visual novels, rankings, previews, and studio notes."
+      content="NTRGAME review archive with Pitchfork-inspired layout, radar scoring, release previews, likes, and reader polls."
     />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="./assets/images/site/masthead.svg" type="image/svg+xml" />
@@ -38,8 +38,8 @@
     <main id="top">
       <section class="issue-strip" aria-label="站点信息">
         <span id="issue-label">Issue 00</span>
-        <span>18+ Editorial / No downloads</span>
-        <span>所有条目默认只讨论成年角色</span>
+        <span>18+ Editorial / No Downloads</span>
+        <span>测评、前瞻、社团观察，只做评论不放资源</span>
       </section>
 
       <section class="hero-layout" id="hero"></section>
@@ -57,7 +57,7 @@
           <span>Reviews</span>
           <h2>Latest Criticism</h2>
         </div>
-        <p>短评、长评、雷点说明和评分都来自同一个数据文件，方便你之后继续扩写。</p>
+        <p>按 NTRGAME REVIEW 的结构整理：规格表、人物目录、雷达评分和长评口吻都从同一个数据文件生成，后面很好改。</p>
       </section>
 
       <section class="review-grid" id="review-grid" aria-live="polite"></section>
@@ -96,10 +96,10 @@
       <section class="notes" id="notes" data-section="notes">
         <div class="note-block">
           <span>Archive</span>
-          <h2>Design references</h2>
+          <h2>Style references</h2>
           <p>
-            原型文件已放进仓库的 <code>reference/</code>。正式博客使用现在这套轻量结构，方便直接部署到
-            GitHub Pages。
+            你的原型文件在 <code>reference/</code>，测评长图和前瞻长图在 <code>assets/images/user-reviews/</code>。
+            正式站点不会只贴长图，而是把结构拆成可维护的网页模块。
           </p>
           <div class="reference-links">
             <a href="./reference/ReviewFork_Pitchfork研究重设计版.html">ReviewFork prototype</a>
@@ -108,15 +108,14 @@
         </div>
         <div class="note-block red">
           <span>Images</span>
-          <h2>Public asset rule</h2>
+          <h2>Public images</h2>
           <p>
-            别人能看到的图片必须在仓库里，例如 <code>assets/images/covers/xxx.jpg</code>。
-            不要引用桌面路径或只存在浏览器里的图片。
+            别人能看到的图片必须进仓库。首页使用轻量展示图，原始长图保留为档案图，避免页面越做越卡。
           </p>
         </div>
         <div class="note-block">
           <span>Interactions</span>
-          <h2>Firebase sync</h2>
+          <h2>Likes & polls</h2>
           <p>
             点赞和投票的云端同步配置写在 <code>config/firebase-config.js</code>。
             详细步骤在 <code>FIREBASE_SETUP.md</code>。
@@ -132,7 +131,7 @@
 
     <footer class="site-footer">
       <span id="footer-brand">ReviewFork</span>
-      <span>Built for GitHub Pages. Images live in the repository.</span>
+      <span>Built for GitHub Pages. Reviews are editable from data/site-data.js.</span>
     </footer>
 
     <noscript>

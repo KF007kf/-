@@ -285,6 +285,7 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   filter: grayscale(100%);
   transition: filter 180ms ease, transform 240ms ease;
 }
@@ -519,6 +520,7 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   filter: grayscale(100%);
   transition: filter 160ms ease, transform 220ms ease;
 }
@@ -565,7 +567,7 @@ main {
 .review-card h3 {
   margin: 0;
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
-  font-size: 34px;
+  font-size: clamp(24px, 2.1vw, 34px);
   font-style: italic;
   font-weight: 950;
   line-height: 0.95;
@@ -576,6 +578,14 @@ main {
   margin: 0;
   color: var(--rf-ink);
   line-height: 1.7;
+}
+
+.source-note {
+  padding-left: 10px;
+  border-left: 4px solid var(--rf-red);
+  color: var(--rf-muted) !important;
+  font-size: 12px;
+  font-weight: 850;
 }
 
 .chip-row {
@@ -656,6 +666,7 @@ main {
   width: 96px;
   height: 92px;
   object-fit: cover;
+  object-position: top center;
   border: 1px solid var(--rf-black);
   filter: grayscale(100%);
 }
@@ -1031,16 +1042,18 @@ main {
 }
 
 .article-hero figure {
+  display: grid;
+  place-items: start center;
   margin: 0;
   border: 3px solid var(--rf-black);
-  background: #dad6cd;
+  background: var(--rf-white);
 }
 
 .article-hero img {
   width: 100%;
-  height: 100%;
-  min-height: 420px;
-  object-fit: cover;
+  max-height: 760px;
+  object-fit: contain;
+  object-position: top center;
 }
 
 .article-specs {
@@ -1108,6 +1121,232 @@ main {
   font-size: 16px;
 }
 
+.directory-wrap {
+  display: grid;
+  gap: 30px;
+  padding-top: 8px;
+}
+
+.directory-section {
+  position: relative;
+  padding-top: 34px;
+  border-top: 5px solid var(--rf-black);
+}
+
+.directory-heading {
+  position: absolute;
+  top: -19px;
+  left: 0;
+}
+
+.directory-heading span {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--rf-white);
+  background: var(--rf-red);
+  border: 2px solid var(--rf-black);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.directory-section.is-antagonist .directory-heading span {
+  background: var(--rf-black);
+}
+
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.directory-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 100%;
+  padding: 12px;
+  background: var(--rf-white);
+  border: 2px solid var(--rf-black);
+  border-radius: 4px;
+}
+
+.directory-card figure {
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  overflow: hidden;
+  background: #ece8df;
+  border: 1px solid var(--rf-black);
+}
+
+.directory-section.is-antagonist .directory-card figure {
+  aspect-ratio: 1 / 1;
+}
+
+.directory-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+}
+
+.directory-card h4 {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--rf-black);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.directory-card strong {
+  color: var(--rf-red);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.directory-card p {
+  margin: 0;
+  color: var(--rf-ink);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.directory-placeholder {
+  color: var(--rf-muted);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.radar-panel {
+  padding: clamp(18px, 3vw, 32px);
+  background:
+    linear-gradient(90deg, rgba(7, 7, 7, 0.035) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(0deg, rgba(7, 7, 7, 0.03) 1px, transparent 1px) 0 0 / 22px 22px,
+    var(--rf-white);
+  border: 3px solid var(--rf-black);
+  border-top: 7px solid var(--rf-red);
+}
+
+.radar-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--rf-black);
+}
+
+.radar-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.radar-head b {
+  color: var(--rf-red);
+  font-size: 14px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.radar-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 0.58fr);
+  gap: 28px;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.radar-visual {
+  display: grid;
+  place-items: center;
+}
+
+.radar-svg {
+  width: min(360px, 100%);
+  height: auto;
+  overflow: visible;
+}
+
+.radar-ring {
+  fill: none;
+  stroke: rgba(7, 7, 7, 0.2);
+  stroke-width: 1;
+}
+
+.radar-axis {
+  stroke: rgba(7, 7, 7, 0.16);
+  stroke-width: 1;
+}
+
+.radar-fill {
+  fill: rgba(255, 53, 48, 0.28);
+}
+
+.radar-stroke {
+  fill: none;
+  stroke: var(--rf-red);
+  stroke-width: 2.5;
+}
+
+.radar-svg text {
+  fill: var(--rf-black);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.radar-notes {
+  display: grid;
+  gap: 11px;
+}
+
+.radar-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rf-line);
+}
+
+.radar-note h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.radar-note p {
+  margin: 0;
+  color: var(--rf-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.radar-pill {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  color: var(--rf-white);
+  background: #3a3a3a;
+  border: 3px solid var(--rf-black);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 var(--rf-black);
+  font-size: 18px;
+  font-weight: 950;
+}
+
 .article-body {
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(260px, 0.28fr);
@@ -1124,6 +1363,15 @@ main {
 
 .article-copy p {
   margin: 0 0 1.15em;
+}
+
+.article-copy blockquote {
+  margin: 0 0 1.25em;
+  padding: 16px 0 16px 18px;
+  border-left: 7px solid var(--rf-red);
+  font-size: clamp(22px, 2.4vw, 31px);
+  font-style: italic;
+  line-height: 1.45;
 }
 
 .article-side {
@@ -1188,7 +1436,8 @@ main {
 @media (max-width: 1080px) {
   .hero-layout,
   .article-hero,
-  .article-body {
+  .article-body,
+  .radar-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1200,7 +1449,8 @@ main {
   .review-grid,
   .poll-grid,
   .ranking-grid,
-  .notes {
+  .notes,
+  .directory-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -1224,6 +1474,7 @@ main {
   .poll-grid,
   .ranking-grid,
   .notes,
+  .directory-grid,
   .watch-month,
   .article-head {
     grid-template-columns: 1fr;

@@ -1,6 +1,6 @@
 # ReviewFork NTRGAME Blog
 
-一个可以直接部署到 GitHub Pages 的静态测评博客。设计方向参考你给的两个原型：Pitchfork 式大标题、黑红硬边框、评分圆章、榜单和新作前瞻。
+一个可以直接部署到 GitHub Pages 的静态测评博客。设计方向参考你给的原型和测评长图：Pitchfork 式大标题、黑红硬边框、评分圆章、规格表、人物目录、雷达评分、榜单和新作前瞻。
 
 ## 怎么改内容
 
@@ -22,9 +22,12 @@ CUSTOMIZE.md
 - `title` / `titleCn`: 英文名和中文名
 - `studio` / `type` / `releaseDate`
 - `cover`: 封面图片路径
+- `displayCover` / `poster`: 文章展示图和原始排版长图
 - `rating`: 评分
 - `tags`: 标签
 - `specs`: 时长、CG 数、场景数等
+- `scores`: 雷达评分和每项短评
+- `directories`: 女主一览、间男一览
 - `body`: 正文段落
 
 ## 怎么放图片
@@ -35,6 +38,7 @@ CUSTOMIZE.md
 assets/images/covers/
 assets/images/characters/
 assets/images/uploads/
+assets/images/user-reviews/
 ```
 
 然后在 `data/site-data.js` 里写相对路径，例如：

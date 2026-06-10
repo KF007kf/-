@@ -177,6 +177,7 @@
   function renderHero() {
     const item = getFeatured();
     const hero = siteConfig().hero || {};
+    const heroImage = item.displayCover || item.cover;
     const titleBefore = hero.titleBefore || "NTRGAME";
     const titleHighlight = hero.titleHighlight || "Review";
     const titleAfter = hero.titleAfter || "Archive";
@@ -204,7 +205,7 @@
       </div>
       <article class="hero-panel">
         <div class="hero-image">
-          ${image(item.cover, item.title)}
+          ${image(heroImage, item.title)}
           <div class="score-badge"><div><small>Rating</small><strong>${score(item.rating)}</strong></div></div>
         </div>
         <div class="hero-panel-body">
@@ -215,7 +216,7 @@
           <h2>${escapeHtml(item.title)}<br />${escapeHtml(item.titleCn)}</h2>
           <p>${escapeHtml(item.summary)}</p>
           <div class="button-row">
-            <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">${escapeHtml(hero.primaryAction || "Read Review")}</button>
+              <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">${escapeHtml(hero.primaryAction || "打开测评")}</button>
             ${likeButton(item.slug)}
             <a class="rf-button" href="#reviews">${escapeHtml(hero.secondaryAction || "Browse Archive")}</a>
           </div>
@@ -276,8 +277,9 @@
             <div class="chip-row">
               ${item.tags.map((tag, index) => `<span class="chip${index === 0 ? " red" : ""}">${escapeHtml(tag)}</span>`).join("")}
             </div>
+            ${item.sourceStatus ? `<p class="source-note">${escapeHtml(item.sourceStatus)}</p>` : ""}
             <div class="button-row">
-              <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">Read Review</button>
+              <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">打开测评</button>
               ${likeButton(item.slug)}
             </div>
           </div>
@@ -401,12 +403,14 @@
   function specCells(item) {
     const specs = item.specs || {};
     return [
-      ["Length", specs.length],
-      ["CG Files", specs.cg],
-      ["Scenes", specs.scenes],
-      ["Voice", specs.voiced],
-      ["Gallery", specs.gallery],
-      ["Type", item.type]
+      ["Length / 时长", specs.length],
+      ["CG Files / 图像数", specs.cg],
+      ["H-Scenes / 场景数", specs.scenes],
+      ["Tags / 标签", (item.tags || []).join(" / ")],
+      ["有无动态", specs.animated],
+      ["有无配音 / 语音", specs.voiced],
+      ["有无回想", specs.gallery],
+      ["资料状态", item.sourceStatus || "站内记录"]
     ]
       .map(
         ([label, value]) => `
@@ -434,6 +438,143 @@
       .join("");
   }
 
+  function polarPoint(cx, cy, radius, index, total) {
+    const angle = -90 + (360 / total) * index;
+    const radians = (angle * Math.PI) / 180;
+    return {
+      x: cx + Math.cos(radians) * radius,
+      y: cy + Math.sin(radians) * radius
+    };
+  }
+
+  function pointString(point) {
+    return `${point.x.toFixed(2)},${point.y.toFixed(2)}`;
+  }
+
+  function renderRadarSvg(item) {
+    const rows = item.scores || [];
+    if (!rows.length) return "";
+    const cx = 120;
+    const cy = 120;
+    const maxRadius = 86;
+    const total = rows.length;
+    const rings = [2, 4, 6, 8, 10]
+      .map((value) => {
+        const radius = (value / 10) * maxRadius;
+        const points = rows.map((_, index) => pointString(polarPoint(cx, cy, radius, index, total))).join(" ");
+        return `<polygon class="radar-ring" points="${points}"></polygon>`;
+      })
+      .join("");
+    const axes = rows
+      .map((_, index) => {
+        const end = polarPoint(cx, cy, maxRadius, index, total);
+        return `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}"></line>`;
+      })
+      .join("");
+    const polygon = rows
+      .map((row, index) => {
+        const radius = (Math.max(0, Math.min(10, Number(row.value || 0))) / 10) * maxRadius;
+        return pointString(polarPoint(cx, cy, radius, index, total));
+      })
+      .join(" ");
+    const labels = rows
+      .map((row, index) => {
+        const labelPoint = polarPoint(cx, cy, maxRadius + 23, index, total);
+        return `
+          <text
+            x="${labelPoint.x.toFixed(2)}"
+            y="${labelPoint.y.toFixed(2)}"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >${escapeHtml(row.label)}</text>
+        `;
+      })
+      .join("");
+
+    return `
+      <svg class="radar-svg" viewBox="0 0 240 240" role="img" aria-label="维度雷达图">
+        ${rings}
+        ${axes}
+        <polygon class="radar-fill" points="${polygon}"></polygon>
+        <polygon class="radar-stroke" points="${polygon}"></polygon>
+        ${labels}
+      </svg>
+    `;
+  }
+
+  function renderRadarPanel(item) {
+    const rows = item.scores || [];
+    if (!rows.length) return "";
+    return `
+      <section class="radar-panel">
+        <div class="radar-head">
+          <h2>维度评分 / RADAR ANALYSIS</h2>
+          <b>${escapeHtml(item.radarTotal || score(item.rating))} / 10</b>
+        </div>
+        <div class="radar-grid">
+          <div class="radar-visual">${renderRadarSvg(item)}</div>
+          <div class="radar-notes">
+            ${rows
+              .map(
+                (row) => `
+              <article class="radar-note">
+                <div>
+                  <h3>${escapeHtml(row.label)}</h3>
+                  <p>${escapeHtml(row.note || "")}</p>
+                </div>
+                <span class="radar-pill">${score(row.value)}</span>
+              </article>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function directoryCards(rows, type) {
+    return (rows || [])
+      .map((person) => {
+        const portrait = person.portrait
+          ? image(person.portrait, person.name)
+          : `<span class="directory-placeholder">No Image</span>`;
+        return `
+          <article class="directory-card ${type === "heroine" ? "is-heroine" : "is-antagonist"}">
+            <figure>${portrait}</figure>
+            <h4>${escapeHtml(person.name || "未命名")}</h4>
+            ${person.role ? `<strong>${escapeHtml(person.role)}</strong>` : ""}
+            <p>${escapeHtml(person.comment || "暂无人物短评。")}</p>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderDirectory(item) {
+    const directories = item.directories || {};
+    const heroines = directories.heroines || [];
+    const antagonists = directories.antagonists || [];
+    if (!heroines.length && !antagonists.length) return "";
+
+    return `
+      <section class="directory-wrap">
+        ${heroines.length ? `
+          <div class="directory-section is-heroine">
+            <div class="directory-heading"><span>HEROINES DIRECTORY / 女主一览</span></div>
+            <div class="directory-grid">${directoryCards(heroines, "heroine")}</div>
+          </div>
+        ` : ""}
+        ${antagonists.length ? `
+          <div class="directory-section is-antagonist">
+            <div class="directory-heading"><span>TARGETS & ANTAGONISTS / 间男一览</span></div>
+            <div class="directory-grid">${directoryCards(antagonists, "antagonist")}</div>
+          </div>
+        ` : ""}
+      </section>
+    `;
+  }
+
   function sideList(title, rows) {
     return `
       <section class="side-list">
@@ -446,6 +587,7 @@
   function openArticle(slug) {
     const item = data.reviews.find((review) => review.slug === slug);
     if (!item) return;
+    const articleImage = item.displayCover || item.cover;
 
     $("#article-sheet").innerHTML = `
       <header class="article-head">
@@ -458,19 +600,24 @@
         </div>
       </header>
       <section class="article-hero">
-        <figure>${image(item.cover, item.title)}</figure>
+        <figure>${image(articleImage, item.title)}</figure>
         <div class="article-specs">${specCells(item)}</div>
       </section>
-      <section class="score-table">${scoreRows(item)}</section>
+      ${renderDirectory(item)}
+      ${renderRadarPanel(item)}
       <section class="article-body">
         <div class="article-copy">
+          <blockquote>${escapeHtml(item.pullquote)}</blockquote>
           ${item.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
         </div>
         <aside class="article-side">
-          <div class="button-row">${likeButton(item.slug, "Like Review")}</div>
+          <div class="button-row">
+            ${likeButton(item.slug, "点赞测评")}
+            ${item.poster ? `<a class="rf-button" href="${escapeHtml(item.poster)}" target="_blank" rel="noopener">原始排版图</a>` : ""}
+          </div>
           <div class="chip-row">${item.tags.map((tag) => `<span class="chip red">${escapeHtml(tag)}</span>`).join("")}</div>
-          ${sideList("Pros", item.pros)}
-          ${sideList("Cons", item.cons)}
+          ${sideList("亮点", item.pros)}
+          ${sideList("问题", item.cons)}
         </aside>
       </section>
     `;
