@@ -191,6 +191,9 @@
     const item = getFeatured();
     const hero = siteConfig().hero || {};
     const heroImage = item.displayCover || item.cover;
+    const heroScoreBadge = item.coverHasScore
+      ? ""
+      : `<div class="score-badge"><div><small>Rating</small><strong>${score(item.rating)}</strong></div></div>`;
     const titleBefore = hero.titleBefore || "NTRGAME";
     const titleHighlight = hero.titleHighlight || "Review";
     const titleAfter = hero.titleAfter || "Archive";
@@ -219,7 +222,7 @@
       <article class="hero-panel">
         <div class="hero-image">
           ${image(heroImage, item.title)}
-          <div class="score-badge"><div><small>Rating</small><strong>${score(item.rating)}</strong></div></div>
+          ${heroScoreBadge}
         </div>
         <div class="hero-panel-body">
           <div class="review-card-kicker">
@@ -1088,7 +1091,6 @@
         <aside class="article-side">
           <div class="button-row">
             ${likeButton(item.slug, "点赞测评")}
-            ${item.poster ? `<a class="rf-button" href="${escapeHtml(item.poster)}" target="_blank" rel="noopener">原始排版图</a>` : ""}
           </div>
           <div class="chip-row">${item.tags.map((tag) => `<span class="chip red">${escapeHtml(tag)}</span>`).join("")}</div>
           ${sideList("亮点", item.pros)}

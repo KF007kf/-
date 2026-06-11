@@ -95,9 +95,10 @@ Each review object controls one card and one article modal. The current NTRGAME 
   title: "My Game",
   titleCn: "我的游戏",
   studio: "Studio Name",
-  cover: "./assets/images/user-reviews/my-game-thumb.jpg",
-  displayCover: "./assets/images/user-reviews/my-game-display.jpg",
+  cover: "./assets/images/user-reviews/my-game-title.jpg",
+  displayCover: "./assets/images/user-reviews/my-game-title.jpg",
   poster: "./assets/images/user-reviews/my-game.png",
+  coverHasScore: true,
   rating: 8.4,
   radarTotal: "8.36",
   sourceStatus: "以站内测评图为准",
@@ -121,7 +122,7 @@ Each review object controls one card and one article modal. The current NTRGAME 
 }
 ```
 
-Use unique `slug` values. `cover` is for homepage cards, `displayCover` is for the article, and `poster` is the original long layout image.
+Use unique `slug` values. `cover` is for homepage cards, `displayCover` is for the article, and `poster` is the original long layout image. If the title image already includes the score circle, set `coverHasScore: true` so the hero does not draw a duplicate score badge.
 
 ## Writing Style
 

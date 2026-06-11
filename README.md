@@ -24,6 +24,7 @@ CUSTOMIZE.md
 - `studio` / `type` / `releaseDate`
 - `cover`: 封面图片路径
 - `displayCover` / `poster`: 文章展示图和原始排版长图
+- `coverHasScore`: 标题裁切图里已经有评分圈时设为 `true`
 - `rating`: 评分
 - `tags`: 标签
 - `specs`: 时长、CG 数、场景数等

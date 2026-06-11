@@ -60,9 +60,10 @@ window.REVIEWFORK_DATA = {
       studio: "おてつ堂",
       type: "短篇 RPG / 人妻题材",
       releaseDate: "2026-01-10",
-      cover: "./assets/images/user-reviews/review-wife-cleanest-thumb.jpg",
-      displayCover: "./assets/images/user-reviews/review-wife-cleanest-display.jpg",
+      cover: "./assets/images/user-reviews/review-wife-cleanest-title.jpg",
+      displayCover: "./assets/images/user-reviews/review-wife-cleanest-title.jpg",
       poster: "./assets/images/user-reviews/review-wife-cleanest.png",
+      coverHasScore: true,
       rating: 7.6,
       radarTotal: "7.58",
       verdict: "短但成型",
@@ -122,9 +123,10 @@ window.REVIEWFORK_DATA = {
       studio: "ぶるーむふらっしゅ",
       type: "中短篇 RPG / 女主人公",
       releaseDate: "2026-03-13",
-      cover: "./assets/images/user-reviews/review-ayame-thumb.jpg",
-      displayCover: "./assets/images/user-reviews/review-ayame-display.jpg",
+      cover: "./assets/images/user-reviews/review-ayame-title.jpg",
+      displayCover: "./assets/images/user-reviews/review-ayame-title.jpg",
       poster: "./assets/images/user-reviews/review-ayame.png",
+      coverHasScore: true,
       rating: 6.3,
       radarTotal: "6.28",
       verdict: "罐头但能卖",
@@ -196,9 +198,10 @@ window.REVIEWFORK_DATA = {
       studio: "ネコノオシ",
       type: "短篇 RPG / 像素探索",
       releaseDate: "2026-06-06",
-      cover: "./assets/images/user-reviews/review-blue-moon-thumb.jpg",
-      displayCover: "./assets/images/user-reviews/review-blue-moon-display.jpg",
+      cover: "./assets/images/user-reviews/review-blue-moon-title.jpg",
+      displayCover: "./assets/images/user-reviews/review-blue-moon-title.jpg",
       poster: "./assets/images/user-reviews/review-blue-moon.png",
+      coverHasScore: true,
       rating: 3.5,
       radarTotal: "3.54",
       verdict: "起飞不能",
@@ -274,7 +277,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年6月下旬",
           score: "B",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "标题和包装都很会摆，战斗幻想味很足。先给 B，不是因为稳，而是这种大标题最容易看上去很大、落地很小。"
         },
         {
@@ -282,7 +285,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年6月下旬",
           score: "C",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "前瞻图的卖点很直，但风险也很直。先放低期待，等实际文本和系统能不能撑住。"
         },
         {
@@ -290,7 +293,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年6月下旬",
           score: "B",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "人设和队列感不错，比较像能做出目录页的作品。问题还是老问题，别只有设定会吹。"
         },
         {
@@ -298,7 +301,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年6月",
           score: "C",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "先按观望处理。图面信息不差，但目前看不出它能不能有核心记忆点。"
         }
       ]
@@ -311,7 +314,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年7月",
           score: "S-",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "这类一眼高期待，主要看它到底是有压迫感，还是只会把氛围词堆满。先给 S-，等实物审判。"
         },
         {
@@ -319,7 +322,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年7月",
           score: "S-",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "前瞻图里最像能冲的一个。RPG、ANOTHER、角色量都摆出来了，成败就看系统别又做成机械劳动。"
         },
         {
@@ -327,7 +330,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年7月",
           score: "B",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "标题已经把牌摊桌上了。传播感强，但也最容易只剩标签。先 B，等看文本有没有脑子。"
         }
       ]
@@ -340,7 +343,7 @@ window.REVIEWFORK_DATA = {
           studio: "图内信息待补源",
           date: "2026年8月21日前后",
           score: "B",
-          cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+          cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
           note: "标题气质很怪，这反而值得盯一下。怪题材最怕做成噱头，也最可能突然给点新味道。"
         }
       ]
@@ -403,7 +406,7 @@ window.REVIEWFORK_DATA = {
             title: "妻の一番綺麗な姿",
             studio: "おてつ堂",
             score: "7.6",
-            cover: "./assets/images/user-reviews/review-wife-cleanest-thumb.jpg",
+            cover: "./assets/images/user-reviews/review-wife-cleanest-title.jpg",
             note: "短但成型，当前短篇样板。"
           },
           {
@@ -411,7 +414,7 @@ window.REVIEWFORK_DATA = {
             title: "武家女当主アヤメの受難",
             studio: "ぶるーむふらっしゅ",
             score: "6.3",
-            cover: "./assets/images/user-reviews/review-ayame-thumb.jpg",
+            cover: "./assets/images/user-reviews/review-ayame-title.jpg",
             note: "罐头但能卖，适合放社团模板研究。"
           },
           {
@@ -419,7 +422,7 @@ window.REVIEWFORK_DATA = {
             title: "青の月は深淵に染まる",
             studio: "ネコノオシ",
             score: "3.5",
-            cover: "./assets/images/user-reviews/review-blue-moon-thumb.jpg",
+            cover: "./assets/images/user-reviews/review-blue-moon-title.jpg",
             note: "起飞不能，低分样本。"
           },
           {
@@ -427,7 +430,7 @@ window.REVIEWFORK_DATA = {
             title: "NTR RPG オチカノ-ANOTHER-",
             studio: "图内信息待补源",
             score: "S-",
-            cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+            cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
             note: "前瞻重点，实物出来再审判。"
           },
           {
@@ -435,7 +438,7 @@ window.REVIEWFORK_DATA = {
             title: "BOXMAN/箱男",
             studio: "图内信息待补源",
             score: "B",
-            cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+            cover: "./assets/images/user-reviews/preview-2026-h2-title.jpg",
             note: "怪题材，先放池子里观察。"
           }
         ]
