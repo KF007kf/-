@@ -132,6 +132,35 @@ The site is set up for a strong personal review voice, not neutral product copy.
 - Let the long review say what you really think, including社团习惯、同类对比、值不值得玩.
 - Keep unknown release data marked in `sourceStatus` instead of inventing it.
 
+## Annual Tier List
+
+The "年度牛油排名" tool is seeded by `annualTier` in `data/site-data.js`:
+
+```js
+annualTier: {
+  activeYear: "2026",
+  defaultTiers: [
+    { id: "s", label: "S / 年度级", color: "#ff3530" }
+  ],
+  boards: [
+    {
+      year: "2026",
+      title: "2026 年度牛油排名",
+      subtitle: "说明文字",
+      tiers: [
+        { id: "a", label: "A / 强推荐", color: "#111111", itemIds: ["my-game"] }
+      ],
+      poolItemIds: [],
+      items: [
+        { id: "my-game", title: "作品名", studio: "社团", score: "8.0", cover: "./assets/images/covers/my-game.jpg", note: "短评" }
+      ]
+    }
+  ]
+}
+```
+
+On the website you can also create years, upload images, drag items between tiers, rename rows, change row colors, edit item text, and save. That save is browser-local. Use "导出 JSON" for backup; to make a finished ranking public for every visitor, put the exported board back into `annualTier.boards` or ask Codex to merge it.
+
 ## Polls
 
 Edit `polls`:

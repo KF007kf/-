@@ -1,6 +1,7 @@
 # ReviewFork NTRGAME Blog
 
 一个可以直接部署到 GitHub Pages 的静态测评博客。设计方向参考你给的原型和测评长图：Pitchfork 式大标题、黑红硬边框、评分圆章、规格表、人物目录、雷达评分、榜单和新作前瞻。
+现在也包含一个站内的“年度牛油排名”工具，可以按年份做 Tier List、上传图片、拖拽排序并保存。
 
 ## 怎么改内容
 
@@ -29,6 +30,8 @@ CUSTOMIZE.md
 - `scores`: 雷达评分和每项短评
 - `directories`: 女主一览、间男一览
 - `body`: 正文段落
+
+年度排名的默认公开数据在 `annualTier.boards` 里。网页上的“保存”会保存到你的浏览器；排好后建议用“导出 JSON”备份。要让所有访客都看到你排好的版本，需要把导出的 JSON 合进 `data/site-data.js` 后再发布。
 
 ## 怎么放图片
 

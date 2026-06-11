@@ -72,6 +72,17 @@
         <div class="watchlist" id="watchlist-list"></div>
       </section>
 
+      <section class="tier-maker" id="annual-tier" data-section="annualTier">
+        <div class="section-rule compact">
+          <div>
+            <span>Annual Tier List</span>
+            <h2>年度牛油排名</h2>
+          </div>
+          <p>按年份新建榜单，上传封面图，把条目拖进不同分层。当前版本会保存到你的浏览器，并可导出 JSON 备份。</p>
+        </div>
+        <div class="tier-app" id="tier-app"></div>
+      </section>
+
       <section class="rankings" id="rankings" data-section="rankings">
         <div class="section-rule compact">
           <div>
@@ -127,6 +138,11 @@
     <dialog class="article-dialog" id="article-dialog">
       <article class="article-sheet" id="article-sheet"></article>
       <button class="dialog-close" id="dialog-close" aria-label="关闭文章">Close</button>
+    </dialog>
+
+    <dialog class="tier-edit-dialog" id="tier-edit-dialog">
+      <article class="tier-edit-sheet" id="tier-edit-sheet"></article>
+      <button class="dialog-close" id="tier-edit-close" aria-label="关闭条目编辑">Close</button>
     </dialog>
 
     <footer class="site-footer">

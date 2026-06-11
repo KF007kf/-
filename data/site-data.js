@@ -17,6 +17,7 @@ window.REVIEWFORK_DATA = {
     navigation: [
       { label: "测评", href: "#reviews" },
       { label: "前瞻", href: "#watchlist" },
+      { label: "年度排名", href: "#annual-tier" },
       { label: "榜单", href: "#rankings" },
       { label: "调研", href: "#community" },
       { label: "维护", href: "#notes" }
@@ -33,6 +34,7 @@ window.REVIEWFORK_DATA = {
     sections: {
       reviews: { enabled: true, kicker: "NTRGAME REVIEW", title: "测评目录" },
       watchlist: { enabled: true, kicker: "MOST ANTICIPATED", title: "26年下半年新作前瞻" },
+      annualTier: { enabled: true, kicker: "ANNUAL TIER LIST", title: "年度牛油排名" },
       rankings: { enabled: true, kicker: "EDITOR'S BOARD", title: "分组榜单" },
       community: { enabled: true, kicker: "COMMUNITY", title: "点赞 & 调研" },
       notes: { enabled: true, kicker: "MAINTENANCE", title: "改站说明" }
@@ -371,6 +373,75 @@ window.REVIEWFORK_DATA = {
       ]
     }
   ],
+
+  annualTier: {
+    activeYear: "2026",
+    defaultTiers: [
+      { id: "s", label: "S / 年度级", color: "#ff3530" },
+      { id: "a", label: "A / 强推荐", color: "#111111" },
+      { id: "b", label: "B / 可玩", color: "#6f6f6f" },
+      { id: "c", label: "C / 观望", color: "#b9b2a8" },
+      { id: "d", label: "D / 慎入", color: "#ded9cf" }
+    ],
+    boards: [
+      {
+        year: "2026",
+        title: "2026 年度牛油排名",
+        subtitle: "先摆样板，后面你可以自己上传图、改分层、拖拽排序，排完保存。",
+        savedAt: "",
+        tiers: [
+          { id: "s", label: "S / 年度级", color: "#ff3530", itemIds: [] },
+          { id: "a", label: "A / 强推荐", color: "#111111", itemIds: ["wife-kirei"] },
+          { id: "b", label: "B / 可玩", color: "#6f6f6f", itemIds: ["ayame-suffering"] },
+          { id: "c", label: "C / 观望", color: "#b9b2a8", itemIds: [] },
+          { id: "d", label: "D / 慎入", color: "#ded9cf", itemIds: ["blue-moon-abyss"] }
+        ],
+        poolItemIds: ["ochikano-another", "boxman"],
+        items: [
+          {
+            id: "wife-kirei",
+            title: "妻の一番綺麗な姿",
+            studio: "おてつ堂",
+            score: "7.6",
+            cover: "./assets/images/user-reviews/review-wife-cleanest-thumb.jpg",
+            note: "短但成型，当前短篇样板。"
+          },
+          {
+            id: "ayame-suffering",
+            title: "武家女当主アヤメの受難",
+            studio: "ぶるーむふらっしゅ",
+            score: "6.3",
+            cover: "./assets/images/user-reviews/review-ayame-thumb.jpg",
+            note: "罐头但能卖，适合放社团模板研究。"
+          },
+          {
+            id: "blue-moon-abyss",
+            title: "青の月は深淵に染まる",
+            studio: "ネコノオシ",
+            score: "3.5",
+            cover: "./assets/images/user-reviews/review-blue-moon-thumb.jpg",
+            note: "起飞不能，低分样本。"
+          },
+          {
+            id: "ochikano-another",
+            title: "NTR RPG オチカノ-ANOTHER-",
+            studio: "图内信息待补源",
+            score: "S-",
+            cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+            note: "前瞻重点，实物出来再审判。"
+          },
+          {
+            id: "boxman",
+            title: "BOXMAN/箱男",
+            studio: "图内信息待补源",
+            score: "B",
+            cover: "./assets/images/user-reviews/preview-2026-h2-thumb.jpg",
+            note: "怪题材，先放池子里观察。"
+          }
+        ]
+      }
+    ]
+  },
 
   polls: [
     {

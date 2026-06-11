@@ -16,7 +16,11 @@
     polls: loadLocal("reviewfork.polls", {}),
     votes: loadLocal("reviewfork.votes", {}),
     busyLikes: new Set(),
-    busyPolls: new Set()
+    busyPolls: new Set(),
+    tierBoards: loadLocal("reviewfork.tierBoards", null),
+    tierActiveYear: loadLocal("reviewfork.tierActiveYear", data.annualTier?.activeYear || "2026"),
+    tierDragId: null,
+    tierEditItemId: null
   };
 
   const $ = (selector) => document.querySelector(selector);
@@ -60,6 +64,14 @@
 
   function saveLocal(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function cloneData(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function uid(prefix = "id") {
+    return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
   }
 
   function escapeHtml(value) {
@@ -134,18 +146,19 @@
 
   function updateStaticSectionHeadings() {
     const sections = [
-      ["reviews", "Reviews", "Latest Criticism"],
-      ["watchlist", "Watchlist", "New Release Radar"],
-      ["rankings", "Rankings", "Editor's Board"],
-      ["community", "Community", "Likes & Polls"]
+      ["reviews", "reviews", "Reviews", "Latest Criticism"],
+      ["watchlist", "watchlist", "Watchlist", "New Release Radar"],
+      ["annual-tier", "annualTier", "Annual Tier List", "年度牛油排名"],
+      ["rankings", "rankings", "Rankings", "Editor's Board"],
+      ["community", "community", "Community", "Likes & Polls"]
     ];
 
-    sections.forEach(([id, kicker, title]) => {
+    sections.forEach(([id, configId, kicker, title]) => {
       const section = document.getElementById(id);
       const label = section?.querySelector(".section-rule span");
       const heading = section?.querySelector(".section-rule h2");
-      if (label) label.textContent = sectionText(id, "kicker", kicker);
-      if (heading) heading.textContent = sectionText(id, "title", title);
+      if (label) label.textContent = sectionText(configId, "kicker", kicker);
+      if (heading) heading.textContent = sectionText(configId, "title", title);
     });
   }
 
@@ -346,6 +359,468 @@
     `
       )
       .join("");
+  }
+
+  function defaultTierRows() {
+    return cloneData(data.annualTier?.defaultTiers || [
+      { id: "s", label: "S / 年度级", color: "#ff3530" },
+      { id: "a", label: "A / 强推荐", color: "#111111" },
+      { id: "b", label: "B / 可玩", color: "#6f6f6f" },
+      { id: "c", label: "C / 观望", color: "#b9b2a8" },
+      { id: "d", label: "D / 慎入", color: "#ded9cf" }
+    ]).map((tier) => ({ ...tier, itemIds: tier.itemIds || [] }));
+  }
+
+  function seedTierBoards() {
+    const boards = cloneData(data.annualTier?.boards || []);
+    return boards.length ? boards : [createTierBoard(data.annualTier?.activeYear || "2026")];
+  }
+
+  function createTierBoard(year) {
+    return {
+      year: String(year || new Date().getFullYear()),
+      title: `${year || new Date().getFullYear()} 年度牛油排名`,
+      subtitle: "新建榜单。上传封面图，把条目拖进分层里，排完记得保存。",
+      savedAt: "",
+      tiers: defaultTierRows(),
+      poolItemIds: [],
+      items: []
+    };
+  }
+
+  function normalizeTierBoard(board) {
+    board.year = String(board.year || new Date().getFullYear());
+    board.title = board.title || `${board.year} 年度牛油排名`;
+    board.subtitle = board.subtitle || "";
+    board.tiers = Array.isArray(board.tiers) && board.tiers.length ? board.tiers : defaultTierRows();
+    board.tiers = board.tiers.map((tier, index) => ({
+      id: tier.id || uid("tier"),
+      label: tier.label || `Tier ${index + 1}`,
+      color: tier.color || "#111111",
+      itemIds: Array.isArray(tier.itemIds) ? tier.itemIds : []
+    }));
+    board.poolItemIds = Array.isArray(board.poolItemIds) ? board.poolItemIds : [];
+    board.items = Array.isArray(board.items) ? board.items : [];
+
+    const itemIds = new Set(board.items.map((item) => item.id));
+    board.tiers.forEach((tier) => {
+      tier.itemIds = tier.itemIds.filter((id, index, list) => itemIds.has(id) && list.indexOf(id) === index);
+    });
+    board.poolItemIds = board.poolItemIds.filter((id, index, list) => itemIds.has(id) && list.indexOf(id) === index);
+
+    const placed = new Set([...board.poolItemIds, ...board.tiers.flatMap((tier) => tier.itemIds)]);
+    board.items.forEach((item) => {
+      if (!placed.has(item.id)) board.poolItemIds.push(item.id);
+    });
+    return board;
+  }
+
+  function initTierState() {
+    if (!Array.isArray(state.tierBoards) || !state.tierBoards.length) {
+      state.tierBoards = seedTierBoards();
+    }
+    state.tierBoards = state.tierBoards.map(normalizeTierBoard);
+    if (!state.tierBoards.some((board) => board.year === state.tierActiveYear)) {
+      state.tierActiveYear = state.tierBoards[0]?.year || data.annualTier?.activeYear || "2026";
+    }
+  }
+
+  function currentTierBoard() {
+    initTierState();
+    return state.tierBoards.find((board) => board.year === state.tierActiveYear) || state.tierBoards[0];
+  }
+
+  function tierItemMap(board) {
+    return new Map((board.items || []).map((item) => [item.id, item]));
+  }
+
+  function tierGroup(board, tierId) {
+    if (tierId === "pool") return board.poolItemIds;
+    return board.tiers.find((tier) => tier.id === tierId)?.itemIds || board.poolItemIds;
+  }
+
+  function saveTierState(showStatus = true) {
+    const board = currentTierBoard();
+    if (board) board.savedAt = new Date().toISOString();
+    try {
+      saveLocal("reviewfork.tierBoards", state.tierBoards);
+      saveLocal("reviewfork.tierActiveYear", state.tierActiveYear);
+      if (showStatus) updateTierStatus("已保存到本机浏览器。要长期备份可以导出 JSON。", "ok");
+    } catch (error) {
+      console.error("Tier save failed", error);
+      updateTierStatus("保存失败：浏览器空间可能满了。请先导出 JSON 备份。", "bad");
+    }
+  }
+
+  function updateTierStatus(message, tone = "idle") {
+    const status = $("#tier-status");
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.tone = tone;
+    if (animationsEnabled()) {
+      window.gsap.fromTo(status, { y: -4, autoAlpha: 0.6 }, { y: 0, autoAlpha: 1, duration: 0.24, overwrite: true });
+    }
+  }
+
+  function formatSavedAt(value) {
+    if (!value) return "尚未手动保存";
+    try {
+      return new Date(value).toLocaleString("zh-CN", { hour12: false });
+    } catch (error) {
+      return value;
+    }
+  }
+
+  function tierCover(item) {
+    if (item.cover) return image(item.cover, item.title || "tier item");
+    return `<span class="tier-card-placeholder">UPLOAD<br />IMAGE</span>`;
+  }
+
+  function renderTierCard(item) {
+    return `
+      <article class="tier-card" draggable="true" data-tier-item="${escapeHtml(item.id)}">
+        <figure>${tierCover(item)}</figure>
+        <div class="tier-card-copy">
+          <strong>${escapeHtml(item.title || "未命名作品")}</strong>
+          <span>${escapeHtml(item.studio || "未知社团")}</span>
+        </div>
+        <b>${escapeHtml(item.score || "-")}</b>
+        <button class="tier-card-edit" type="button" data-tier-edit="${escapeHtml(item.id)}" title="编辑条目">编辑</button>
+      </article>
+    `;
+  }
+
+  function renderTierRows(board) {
+    const items = tierItemMap(board);
+    const rows = board.tiers
+      .map((tier) => {
+        const cards = tier.itemIds.map((id) => items.get(id)).filter(Boolean).map(renderTierCard).join("");
+        return `
+          <section class="tier-row" data-tier-drop="${escapeHtml(tier.id)}" style="--tier-color:${escapeHtml(tier.color)}">
+            <div class="tier-label">
+              <input class="tier-label-input" value="${escapeHtml(tier.label)}" data-tier-label="${escapeHtml(tier.id)}" aria-label="分层名称" />
+              <input class="tier-color-input" type="color" value="${escapeHtml(tier.color)}" data-tier-color="${escapeHtml(tier.id)}" aria-label="分层颜色" />
+              <button class="tier-row-remove" type="button" data-tier-remove="${escapeHtml(tier.id)}" title="删除分层">×</button>
+            </div>
+            <div class="tier-dropzone" data-tier-drop="${escapeHtml(tier.id)}">
+              ${cards || `<span class="tier-empty">拖到这里</span>`}
+            </div>
+          </section>
+        `;
+      })
+      .join("");
+    const poolCards = board.poolItemIds.map((id) => items.get(id)).filter(Boolean).map(renderTierCard).join("");
+
+    return `
+      <div class="tier-board" data-tier-board="${escapeHtml(board.year)}">
+        ${rows}
+        <section class="tier-pool" data-tier-drop="pool">
+          <div>
+            <span>IMAGE POOL / 未上榜素材池</span>
+            <p>上传的新图会先到这里，再拖到上面的分层。</p>
+          </div>
+          <div class="tier-pool-grid" data-tier-drop="pool">
+            ${poolCards || `<span class="tier-empty">这里暂时没有待排条目</span>`}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function renderAnnualTier() {
+    const root = $("#tier-app");
+    if (!root) return;
+    initTierState();
+    const board = currentTierBoard();
+    const years = state.tierBoards.map((item) => item.year);
+
+    root.innerHTML = `
+      <div class="tier-toolbar">
+        <div class="tier-year-tabs" aria-label="年度排名年份">
+          ${years
+            .map(
+              (year) => `
+            <button class="tier-year-tab${year === board.year ? " is-active" : ""}" type="button" data-tier-year="${escapeHtml(year)}">${escapeHtml(year)}</button>
+          `
+            )
+            .join("")}
+        </div>
+        <div class="tier-actions">
+          <button class="rf-button primary" type="button" data-tier-upload-trigger>上传图片</button>
+          <button class="rf-button" type="button" data-tier-add-item>新增空条目</button>
+          <button class="rf-button" type="button" data-tier-add-row>新增分层</button>
+          <button class="rf-button" type="button" data-tier-new-year>新建年份</button>
+          <button class="rf-button primary" type="button" data-tier-save>保存</button>
+          <button class="rf-button" type="button" data-tier-export>导出 JSON</button>
+          <button class="rf-button" type="button" data-tier-import-trigger>导入 JSON</button>
+          <input id="tier-upload-input" type="file" accept="image/*" multiple hidden />
+          <input id="tier-import-input" type="file" accept="application/json,.json" hidden />
+        </div>
+      </div>
+
+      <div class="tier-meta-editor">
+        <label>
+          <span>YEAR / 年份</span>
+          <input value="${escapeHtml(board.year)}" data-tier-board-field="year" />
+        </label>
+        <label>
+          <span>TITLE / 榜单标题</span>
+          <input value="${escapeHtml(board.title)}" data-tier-board-field="title" />
+        </label>
+        <label class="wide">
+          <span>NOTE / 榜单说明</span>
+          <input value="${escapeHtml(board.subtitle)}" data-tier-board-field="subtitle" />
+        </label>
+      </div>
+
+      <div class="tier-status-line">
+        <span id="tier-status" data-tone="idle">当前榜单：${escapeHtml(board.title)} / ${escapeHtml(formatSavedAt(board.savedAt))}</span>
+        <span>拖拽排序 / 本地保存 / JSON 备份</span>
+      </div>
+
+      ${renderTierRows(board)}
+    `;
+    animateDynamicContent("#tier-app .tier-row, #tier-app .tier-pool, #tier-app .tier-card");
+  }
+
+  function moveTierItem(itemId, destinationId, beforeItemId = null) {
+    const board = currentTierBoard();
+    const groups = [board.poolItemIds, ...board.tiers.map((tier) => tier.itemIds)];
+    groups.forEach((group) => {
+      const index = group.indexOf(itemId);
+      if (index >= 0) group.splice(index, 1);
+    });
+
+    const destination = tierGroup(board, destinationId);
+    if (beforeItemId && beforeItemId !== itemId) {
+      const beforeIndex = destination.indexOf(beforeItemId);
+      if (beforeIndex >= 0) destination.splice(beforeIndex, 0, itemId);
+      else destination.push(itemId);
+    } else {
+      destination.push(itemId);
+    }
+    saveTierState(false);
+    renderAnnualTier();
+    updateTierStatus("排序已更新并自动保存。", "ok");
+  }
+
+  function addTierYear(year) {
+    const cleanYear = String(year || "").trim();
+    if (!cleanYear) return;
+    const existing = state.tierBoards.find((board) => board.year === cleanYear);
+    if (existing) {
+      state.tierActiveYear = cleanYear;
+      saveTierState(false);
+      renderAnnualTier();
+      updateTierStatus(`已切换到 ${cleanYear}。`, "ok");
+      return;
+    }
+    state.tierBoards.push(createTierBoard(cleanYear));
+    state.tierActiveYear = cleanYear;
+    saveTierState(false);
+    renderAnnualTier();
+    updateTierStatus(`已新建 ${cleanYear} 年度榜单。`, "ok");
+  }
+
+  function addTierRow() {
+    const board = currentTierBoard();
+    board.tiers.push({ id: uid("tier"), label: "NEW / 新分层", color: "#111111", itemIds: [] });
+    saveTierState(false);
+    renderAnnualTier();
+    updateTierStatus("已新增分层。", "ok");
+  }
+
+  function addTierItem(seed = {}) {
+    const board = currentTierBoard();
+    const item = {
+      id: seed.id || uid("item"),
+      title: seed.title || "未命名作品",
+      studio: seed.studio || "未知社团",
+      score: seed.score || "-",
+      cover: seed.cover || "",
+      note: seed.note || ""
+    };
+    board.items.push(item);
+    board.poolItemIds.push(item.id);
+    saveTierState(false);
+    renderAnnualTier();
+    openTierItemEditor(item.id);
+  }
+
+  function removeTierRow(tierId) {
+    const board = currentTierBoard();
+    if (board.tiers.length <= 1) {
+      updateTierStatus("至少保留一个分层。", "bad");
+      return;
+    }
+    const tier = board.tiers.find((row) => row.id === tierId);
+    if (!tier) return;
+    board.poolItemIds.push(...tier.itemIds);
+    board.tiers = board.tiers.filter((row) => row.id !== tierId);
+    saveTierState(false);
+    renderAnnualTier();
+    updateTierStatus("分层已删除，里面的条目回到素材池。", "ok");
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function compressImageFile(file) {
+    const dataUrl = await readFileAsDataUrl(file);
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 680;
+        const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const width = Math.max(1, Math.round(img.width * ratio));
+        const height = Math.max(1, Math.round(img.height * ratio));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
+  async function uploadTierImages(files) {
+    const board = currentTierBoard();
+    const imageFiles = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+    if (!imageFiles.length) return;
+    updateTierStatus("正在压缩并加入图片……", "idle");
+    for (const file of imageFiles) {
+      const cover = await compressImageFile(file);
+      const name = file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || "未命名作品";
+      const id = uid("item");
+      board.items.push({ id, title: name, studio: "待补社团", score: "-", cover, note: "" });
+      board.poolItemIds.push(id);
+    }
+    saveTierState(false);
+    renderAnnualTier();
+    updateTierStatus(`已加入 ${imageFiles.length} 张图片。`, "ok");
+  }
+
+  function exportTierBoard() {
+    const board = currentTierBoard();
+    const payload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      board
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `ntrgame-tier-${board.year}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    updateTierStatus("已导出 JSON 备份。", "ok");
+  }
+
+  async function importTierBoard(file) {
+    if (!file) return;
+    try {
+      const payload = JSON.parse(await file.text());
+      const incomingBoards = Array.isArray(payload.boards)
+        ? payload.boards
+        : [payload.board || payload].filter(Boolean);
+      incomingBoards.map(normalizeTierBoard).forEach((incoming) => {
+        const index = state.tierBoards.findIndex((board) => board.year === incoming.year);
+        if (index >= 0) state.tierBoards[index] = incoming;
+        else state.tierBoards.push(incoming);
+        state.tierActiveYear = incoming.year;
+      });
+      saveTierState(false);
+      renderAnnualTier();
+      updateTierStatus("JSON 已导入。", "ok");
+    } catch (error) {
+      console.error("Tier import failed", error);
+      updateTierStatus("导入失败：JSON 格式不对。", "bad");
+    }
+  }
+
+  function findTierItem(itemId) {
+    const board = currentTierBoard();
+    return board.items.find((item) => item.id === itemId);
+  }
+
+  function openTierItemEditor(itemId) {
+    const item = findTierItem(itemId);
+    if (!item) return;
+    state.tierEditItemId = itemId;
+    $("#tier-edit-sheet").innerHTML = `
+      <header class="tier-edit-head">
+        <span class="eyebrow">TIER ITEM / 条目编辑</span>
+        <h2>${escapeHtml(item.title || "未命名作品")}</h2>
+      </header>
+      <div class="tier-edit-grid">
+        <figure class="tier-edit-preview">${tierCover(item)}</figure>
+        <div class="tier-edit-fields">
+          <label><span>标题</span><input id="tier-edit-title" value="${escapeHtml(item.title || "")}" /></label>
+          <label><span>社团</span><input id="tier-edit-studio" value="${escapeHtml(item.studio || "")}" /></label>
+          <label><span>分数/等级</span><input id="tier-edit-score" value="${escapeHtml(item.score || "")}" /></label>
+          <label><span>备注</span><textarea id="tier-edit-note">${escapeHtml(item.note || "")}</textarea></label>
+          <label><span>替换图片</span><input id="tier-edit-cover" type="file" accept="image/*" /></label>
+        </div>
+      </div>
+      <div class="button-row">
+        <button class="rf-button primary" type="button" data-tier-edit-save>保存条目</button>
+        <button class="rf-button" type="button" data-tier-edit-remove>删除条目</button>
+      </div>
+    `;
+    const dialog = $("#tier-edit-dialog");
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "open");
+    if (animationsEnabled()) {
+      window.gsap.fromTo("#tier-edit-sheet > *", { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.05, duration: 0.32 });
+    }
+  }
+
+  function closeTierItemEditor() {
+    const dialog = $("#tier-edit-dialog");
+    if (dialog?.open && typeof dialog.close === "function") dialog.close();
+    dialog?.removeAttribute("open");
+    state.tierEditItemId = null;
+  }
+
+  async function saveTierItemEditor() {
+    const item = findTierItem(state.tierEditItemId);
+    if (!item) return;
+    item.title = $("#tier-edit-title")?.value.trim() || "未命名作品";
+    item.studio = $("#tier-edit-studio")?.value.trim() || "未知社团";
+    item.score = $("#tier-edit-score")?.value.trim() || "-";
+    item.note = $("#tier-edit-note")?.value.trim() || "";
+    const file = $("#tier-edit-cover")?.files?.[0];
+    if (file) item.cover = await compressImageFile(file);
+    saveTierState(false);
+    closeTierItemEditor();
+    renderAnnualTier();
+    updateTierStatus("条目已保存。", "ok");
+  }
+
+  function removeTierItemEditor() {
+    const board = currentTierBoard();
+    const itemId = state.tierEditItemId;
+    board.items = board.items.filter((item) => item.id !== itemId);
+    board.poolItemIds = board.poolItemIds.filter((id) => id !== itemId);
+    board.tiers.forEach((tier) => {
+      tier.itemIds = tier.itemIds.filter((id) => id !== itemId);
+    });
+    saveTierState(false);
+    closeTierItemEditor();
+    renderAnnualTier();
+    updateTierStatus("条目已删除。", "ok");
   }
 
   function pollCounts(pollId) {
@@ -891,7 +1366,7 @@
     killScrollAnimations();
 
     const gsap = window.gsap;
-    const targets = gsap.utils.toArray(".review-card, .watch-month, .ranking-list, .poll-card, .note-block");
+    const targets = gsap.utils.toArray(".review-card, .watch-month, .tier-maker, .tier-row, .ranking-list, .poll-card, .note-block");
     gsap.set(targets, { autoAlpha: 0, y: 34, scale: 0.985 });
     const triggers = window.ScrollTrigger.batch(targets, {
       start: "top 88%",
@@ -939,6 +1414,8 @@
     const hoverSelector = [
       ".review-card",
       ".watch-item",
+      ".tier-card",
+      ".tier-row",
       ".ranking-list",
       ".poll-option",
       ".rf-button",
@@ -1043,6 +1520,73 @@
         return;
       }
 
+      const tierYear = event.target.closest("[data-tier-year]");
+      if (tierYear) {
+        state.tierActiveYear = tierYear.dataset.tierYear;
+        saveTierState(false);
+        renderAnnualTier();
+        updateTierStatus(`已切换到 ${state.tierActiveYear}。`, "ok");
+        return;
+      }
+
+      if (event.target.closest("[data-tier-new-year]")) {
+        const year = window.prompt("输入要新建的年份，例如 2026、2025、2024");
+        addTierYear(year);
+        return;
+      }
+
+      if (event.target.closest("[data-tier-save]")) {
+        saveTierState(true);
+        return;
+      }
+
+      if (event.target.closest("[data-tier-add-row]")) {
+        addTierRow();
+        return;
+      }
+
+      if (event.target.closest("[data-tier-add-item]")) {
+        addTierItem();
+        return;
+      }
+
+      if (event.target.closest("[data-tier-upload-trigger]")) {
+        $("#tier-upload-input")?.click();
+        return;
+      }
+
+      if (event.target.closest("[data-tier-export]")) {
+        exportTierBoard();
+        return;
+      }
+
+      if (event.target.closest("[data-tier-import-trigger]")) {
+        $("#tier-import-input")?.click();
+        return;
+      }
+
+      const tierRemove = event.target.closest("[data-tier-remove]");
+      if (tierRemove) {
+        removeTierRow(tierRemove.dataset.tierRemove);
+        return;
+      }
+
+      const tierEdit = event.target.closest("[data-tier-edit]");
+      if (tierEdit) {
+        openTierItemEditor(tierEdit.dataset.tierEdit);
+        return;
+      }
+
+      if (event.target.closest("[data-tier-edit-save]")) {
+        saveTierItemEditor();
+        return;
+      }
+
+      if (event.target.closest("[data-tier-edit-remove]")) {
+        removeTierItemEditor();
+        return;
+      }
+
       const openButton = event.target.closest("[data-open]");
       if (openButton) openArticle(openButton.dataset.open);
 
@@ -1059,12 +1603,118 @@
       renderReviews();
     });
 
+    document.addEventListener("change", async (event) => {
+      const boardField = event.target.closest("[data-tier-board-field]");
+      if (boardField) {
+        const board = currentTierBoard();
+        const field = boardField.dataset.tierBoardField;
+        const value = boardField.value.trim();
+        if (field === "year") {
+          if (!value) {
+            renderAnnualTier();
+            updateTierStatus("年份不能为空。", "bad");
+            return;
+          }
+          const duplicate = state.tierBoards.some((item) => item !== board && item.year === value);
+          if (duplicate) {
+            renderAnnualTier();
+            updateTierStatus("这个年份已经存在，不能重复。", "bad");
+            return;
+          }
+          board.year = value;
+          state.tierActiveYear = value;
+        } else {
+          board[field] = value;
+        }
+        saveTierState(false);
+        renderAnnualTier();
+        updateTierStatus("榜单信息已保存。", "ok");
+        return;
+      }
+
+      const tierLabel = event.target.closest("[data-tier-label]");
+      if (tierLabel) {
+        const tier = currentTierBoard().tiers.find((item) => item.id === tierLabel.dataset.tierLabel);
+        if (tier) tier.label = tierLabel.value.trim() || "未命名分层";
+        saveTierState(false);
+        renderAnnualTier();
+        updateTierStatus("分层名称已保存。", "ok");
+        return;
+      }
+
+      const tierColor = event.target.closest("[data-tier-color]");
+      if (tierColor) {
+        const tier = currentTierBoard().tiers.find((item) => item.id === tierColor.dataset.tierColor);
+        if (tier) tier.color = tierColor.value;
+        saveTierState(false);
+        renderAnnualTier();
+        updateTierStatus("分层颜色已保存。", "ok");
+        return;
+      }
+
+      if (event.target.id === "tier-upload-input") {
+        await uploadTierImages(event.target.files);
+        event.target.value = "";
+        return;
+      }
+
+      if (event.target.id === "tier-import-input") {
+        await importTierBoard(event.target.files?.[0]);
+        event.target.value = "";
+      }
+    });
+
+    document.addEventListener("dragstart", (event) => {
+      const card = event.target.closest("[data-tier-item]");
+      if (!card) return;
+      state.tierDragId = card.dataset.tierItem;
+      card.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", state.tierDragId);
+    });
+
+    document.addEventListener("dragend", (event) => {
+      event.target.closest("[data-tier-item]")?.classList.remove("is-dragging");
+      document.querySelectorAll(".is-tier-over").forEach((node) => node.classList.remove("is-tier-over"));
+      state.tierDragId = null;
+    });
+
+    document.addEventListener("dragover", (event) => {
+      const zone = event.target.closest("[data-tier-drop]");
+      if (!zone || !state.tierDragId) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      zone.classList.add("is-tier-over");
+    });
+
+    document.addEventListener("dragleave", (event) => {
+      const zone = event.target.closest("[data-tier-drop]");
+      if (!zone || zone.contains(event.relatedTarget)) return;
+      zone.classList.remove("is-tier-over");
+    });
+
+    document.addEventListener("drop", (event) => {
+      const zone = event.target.closest("[data-tier-drop]");
+      if (!zone || !state.tierDragId) return;
+      event.preventDefault();
+      const targetCard = event.target.closest("[data-tier-item]");
+      const beforeItemId = targetCard?.dataset.tierItem;
+      moveTierItem(state.tierDragId, zone.dataset.tierDrop, beforeItemId);
+    });
+
     $("#dialog-close").addEventListener("click", closeArticle);
     $("#article-dialog").addEventListener("click", (event) => {
       if (event.target.id === "article-dialog") closeArticle();
     });
+    $("#tier-edit-close").addEventListener("click", closeTierItemEditor);
+    $("#tier-edit-dialog").addEventListener("click", (event) => {
+      if (event.target.id === "tier-edit-dialog") closeTierItemEditor();
+    });
     window.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeArticle();
+      if (event.key === "Escape") {
+        closeArticle();
+        closeTierItemEditor();
+      }
     });
   }
 
@@ -1081,6 +1731,7 @@
     renderReviews();
     renderWatchlist();
     renderRankings();
+    renderAnnualTier();
     renderPolls();
     bindEvents();
     initGsapAnimations();
