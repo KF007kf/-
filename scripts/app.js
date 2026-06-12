@@ -96,8 +96,14 @@
     return data.reviews.find((item) => item.slug === data.featuredSlug) || data.reviews[0];
   }
 
-  function image(src, alt) {
-    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" />`;
+  function image(src, alt, options = {}) {
+    const loading = options.loading || "lazy";
+    const fetchPriority = options.fetchpriority ? ` fetchpriority="${escapeHtml(options.fetchpriority)}"` : "";
+    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="${escapeHtml(loading)}"${fetchPriority} />`;
+  }
+
+  function reviewUrl(slug) {
+    return `./reviews/${encodeURIComponent(slug)}/`;
   }
 
   function applySiteCustomization() {
@@ -221,7 +227,7 @@
       </div>
       <article class="hero-panel">
         <div class="hero-image">
-          ${image(heroImage, item.title)}
+          ${image(heroImage, item.title, { loading: "eager", fetchpriority: "high" })}
           ${heroScoreBadge}
         </div>
         <div class="hero-panel-body">
@@ -232,7 +238,7 @@
           <h2>${escapeHtml(item.title)}<br />${escapeHtml(item.titleCn)}</h2>
           <p>${escapeHtml(item.summary)}</p>
           <div class="button-row">
-              <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">${escapeHtml(hero.primaryAction || "打开测评")}</button>
+              <a class="rf-button primary" href="${reviewUrl(item.slug)}" data-open="${escapeHtml(item.slug)}">${escapeHtml(hero.primaryAction || "打开测评")}</a>
             ${likeButton(item.slug)}
             <a class="rf-button" href="#reviews">${escapeHtml(hero.secondaryAction || "Browse Archive")}</a>
           </div>
@@ -251,7 +257,7 @@
     $("#tag-filter").innerHTML = allTags()
       .map((tag) => {
         const active = tag === state.tag ? " is-active" : "";
-        return `<button class="tag-button${active}" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
+        return `<button class="tag-button${active}" data-tag="${escapeHtml(tag)}" aria-pressed="${tag === state.tag ? "true" : "false"}">${escapeHtml(tag)}</button>`;
       })
       .join("");
   }
@@ -279,10 +285,10 @@
           .map(
             (item) => `
         <article class="review-card">
-          <div class="review-card-image">
+          <a class="review-card-image" href="${reviewUrl(item.slug)}" data-open="${escapeHtml(item.slug)}">
             ${image(item.cover, item.title)}
             <div class="card-score">${score(item.rating)}</div>
-          </div>
+          </a>
           <div class="review-card-body">
             <div class="review-card-kicker">
               <span>${escapeHtml(item.studio)}</span>
@@ -295,7 +301,7 @@
             </div>
             ${item.sourceStatus ? `<p class="source-note">${escapeHtml(item.sourceStatus)}</p>` : ""}
             <div class="button-row">
-              <button class="rf-button primary" data-open="${escapeHtml(item.slug)}">打开测评</button>
+              <a class="rf-button primary" href="${reviewUrl(item.slug)}" data-open="${escapeHtml(item.slug)}">打开测评</a>
               ${likeButton(item.slug)}
             </div>
           </div>
@@ -861,6 +867,7 @@
                       data-poll="${escapeHtml(poll.id)}"
                       data-option="${escapeHtml(option.id)}"
                       style="--poll-width:${pct}%"
+                      aria-pressed="${selected === option.id ? "true" : "false"}"
                       ${busy}
                     >
                       <strong>${escapeHtml(option.label)}</strong>
@@ -1106,7 +1113,6 @@
       dialog.setAttribute("open", "open");
     }
     animateArticleOpen();
-    history.replaceState(null, "", `#review/${slug}`);
   }
 
   function closeArticle(skipAnimation = false) {
@@ -1316,7 +1322,6 @@
   function initGsapAnimations() {
     if (!hasGsap()) return;
 
-    document.body.classList.add("gsap-ready");
     const gsap = window.gsap;
     if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
@@ -1328,6 +1333,7 @@
 
     if (!animationsEnabled()) return;
 
+    document.body.classList.add("gsap-ready");
     bindGsapHover();
     runPageIntro();
     setupScrollAnimations();
@@ -1590,7 +1596,11 @@
       }
 
       const openButton = event.target.closest("[data-open]");
-      if (openButton) openArticle(openButton.dataset.open);
+      if (openButton) {
+        event.preventDefault();
+        openArticle(openButton.dataset.open);
+        return;
+      }
 
       const tagButton = event.target.closest("[data-tag]");
       if (tagButton) {

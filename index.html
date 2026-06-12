@@ -8,11 +8,22 @@
       name="description"
       content="NTRGAME review archive with Pitchfork-inspired layout, radar scoring, release previews, likes, and reader polls."
     />
+    <link rel="canonical" href="https://kf007kf.github.io/-/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="NTRGAME REVIEW - 牛油测评与前瞻档案" />
+    <meta
+      property="og:description"
+      content="Pitchfork-inspired NTRGAME review archive with radar scoring, release previews, annual tier lists, likes, and reader polls."
+    />
+    <meta property="og:url" content="https://kf007kf.github.io/-/" />
+    <meta property="og:image" content="https://kf007kf.github.io/-/assets/images/user-reviews/review-wife-cleanest-title.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="./assets/images/site/masthead.svg" type="image/svg+xml" />
+    <link rel="preload" as="image" href="./assets/images/user-reviews/review-wife-cleanest-title.jpg" fetchpriority="high" />
     <link rel="stylesheet" href="./styles/main.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="./data/site-data.js"></script>
     <script src="./config/firebase-config.js"></script>
     <script src="./scripts/app.js" defer></script>
@@ -22,8 +33,8 @@
       <a class="brand" href="#top" aria-label="ReviewFork home">
         <img src="./assets/images/site/masthead.svg" alt="" class="brand-mark" />
         <span>
-          <strong id="brand-name">ReviewFork</strong>
-          <small id="brand-subtitle">NTRGAME Editorial Archive</small>
+          <strong id="brand-name">NTRGAME REVIEW</strong>
+          <small id="brand-subtitle">ReviewFork / 牛油测评档案</small>
         </span>
       </a>
       <nav class="top-nav" id="top-nav" aria-label="主导航">
@@ -37,39 +48,311 @@
 
     <main id="top">
       <section class="issue-strip" aria-label="站点信息">
-        <span id="issue-label">Issue 00</span>
+        <span id="issue-label">Issue 2026.06 / NTRGAME-REVIEW</span>
         <span>18+ Editorial / No Downloads</span>
         <span>测评、前瞻、社团观察，只做评论不放资源</span>
       </section>
 
-      <section class="hero-layout" id="hero"></section>
+      <section class="hero-layout" id="hero">
+        <!-- static:hero:start -->
+
+      <div class="hero-copy">
+        <div>
+          <span class="eyebrow">Featured Review / 短但成型</span>
+          <h1 class="hero-title">
+            <span class="word">NTRGAME</span>
+            <em class="word">Review</em>
+            <span class="word">Fork</span>
+          </h1>
+          <p class="hero-lede">短得离谱，但它至少知道自己要端哪盘菜。五十多张图压进一个小体量里，粗糙归粗糙，完成度反而比很多大饼社团像样。</p>
+        </div>
+        <div class="hero-meta">
+          <span>Editor <b>树本藤</b></span>
+          <span>Featured <b>短篇人妻线 / おてつ堂</b></span>
+          <span>Studio <b>おてつ堂</b></span>
+          <span>Score <b>7.6</b></span>
+        </div>
+      </div>
+      <article class="hero-panel">
+        <div class="hero-image">
+          <img src="./assets/images/user-reviews/review-wife-cleanest-title.jpg" alt="妻の一番綺麗な姿" loading="eager" fetchpriority="high" />
+
+        </div>
+        <div class="hero-panel-body">
+          <div class="review-card-kicker">
+            <span>短篇 RPG / 人妻题材</span>
+            <span>2026-01-10</span>
+          </div>
+          <h2>妻の一番綺麗な姿<br />短篇人妻线 / おてつ堂</h2>
+          <p>作为 2026 年第一部测评样张，这作最适合拿来立博客标准：体量小、信息密、雷点明确，优缺点都能一眼拆出来。</p>
+          <div class="button-row">
+            <a class="rf-button primary" href="./reviews/wife-kirei/" data-open="wife-kirei">打开测评</a>
+
+    <button class="like-button" data-like="wife-kirei" data-like-label="Like" aria-pressed="false">
+      <span>Like</span>
+      <b data-like-count="wife-kirei">0</b>
+    </button>
+
+            <a class="rf-button" href="#reviews">看目录</a>
+          </div>
+        </div>
+      </article>
+        <!-- static:hero:end -->
+      </section>
 
       <section class="control-bar" aria-label="筛选测评">
         <label class="search-box">
           <span>Search</span>
           <input id="search-input" type="search" placeholder="标题、社团、标签" autocomplete="off" />
         </label>
-        <div class="tag-filter" id="tag-filter" aria-label="标签筛选"></div>
+        <div class="tag-filter" id="tag-filter" aria-label="标签筛选">
+          <!-- static:tags:start -->
+<button class="tag-button is-active" data-tag="All" aria-pressed="true">All</button>
+          <button class="tag-button" data-tag="男主人公" aria-pressed="false">男主人公</button>
+          <button class="tag-button" data-tag="断面图" aria-pressed="false">断面图</button>
+          <button class="tag-button" data-tag="人妻" aria-pressed="false">人妻</button>
+          <button class="tag-button" data-tag="浴衣/和服" aria-pressed="false">浴衣/和服</button>
+          <button class="tag-button" data-tag="被NTR(苦主视角)" aria-pressed="false">被NTR(苦主视角)</button>
+          <button class="tag-button" data-tag="故意被NTR" aria-pressed="false">故意被NTR</button>
+          <button class="tag-button" data-tag="绿奴" aria-pressed="false">绿奴</button>
+          <button class="tag-button" data-tag="怀孕" aria-pressed="false">怀孕</button>
+          <button class="tag-button" data-tag="巨乳/爆乳" aria-pressed="false">巨乳/爆乳</button>
+          <button class="tag-button" data-tag="女主人公" aria-pressed="false">女主人公</button>
+          <button class="tag-button" data-tag="NTR(黄毛视角)" aria-pressed="false">NTR(黄毛视角)</button>
+          <button class="tag-button" data-tag="高潮脸/阿黑颜" aria-pressed="false">高潮脸/阿黑颜</button>
+          <button class="tag-button" data-tag="像素" aria-pressed="false">像素</button>
+          <button class="tag-button" data-tag="BSS/暗恋被抢" aria-pressed="false">BSS/暗恋被抢</button>
+          <button class="tag-button" data-tag="男女" aria-pressed="false">男女</button>
+          <button class="tag-button" data-tag="口交" aria-pressed="false">口交</button>
+        <!-- static:tags:end -->
+        </div>
       </section>
 
       <section class="section-rule" id="reviews" data-section="reviews">
         <div>
-          <span>Reviews</span>
-          <h2>Latest Criticism</h2>
+          <span>NTRGAME REVIEW</span>
+          <h2>测评目录</h2>
         </div>
         <p>按 NTRGAME REVIEW 的结构整理：规格表、人物目录、雷达评分和长评口吻都从同一个数据文件生成，后面很好改。</p>
       </section>
 
-      <section class="review-grid" id="review-grid" aria-live="polite"></section>
+      <section class="review-grid" id="review-grid" aria-live="polite">
+        <!-- static:reviews:start -->
+
+        <article class="review-card">
+          <a class="review-card-image" href="./reviews/wife-kirei/" data-open="wife-kirei">
+            <img src="./assets/images/user-reviews/review-wife-cleanest-title.jpg" alt="妻の一番綺麗な姿" loading="lazy" />
+            <div class="card-score">7.6</div>
+          </a>
+          <div class="review-card-body">
+            <div class="review-card-kicker">
+              <span>おてつ堂</span>
+              <span>2026-01-10</span>
+            </div>
+            <h3>妻の一番綺麗な姿<br />短篇人妻线 / おてつ堂</h3>
+            <p>作为 2026 年第一部测评样张，这作最适合拿来立博客标准：体量小、信息密、雷点明确，优缺点都能一眼拆出来。</p>
+            <div class="chip-row">
+              <span class="chip red">男主人公</span><span class="chip">断面图</span><span class="chip">人妻</span><span class="chip">浴衣/和服</span><span class="chip">被NTR(苦主视角)</span><span class="chip">故意被NTR</span><span class="chip">绿奴</span><span class="chip">怀孕</span><span class="chip">巨乳/爆乳</span>
+            </div>
+            <p class="source-note">以你给的测评图为准，网络未稳定核验</p>
+            <div class="button-row">
+              <a class="rf-button primary" href="./reviews/wife-kirei/" data-open="wife-kirei">打开测评</a>
+
+    <button class="like-button" data-like="wife-kirei" data-like-label="Like" aria-pressed="false">
+      <span>Like</span>
+      <b data-like-count="wife-kirei">0</b>
+    </button>
+
+            </div>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <a class="review-card-image" href="./reviews/ayame-suffering/" data-open="ayame-suffering">
+            <img src="./assets/images/user-reviews/review-ayame-title.jpg" alt="武家女当主アヤメの受難 ～刀と愛と助平小僧から離れられない体～" loading="lazy" />
+            <div class="card-score">6.3</div>
+          </a>
+          <div class="review-card-body">
+            <div class="review-card-kicker">
+              <span>ぶるーむふらっしゅ</span>
+              <span>2026-03-13</span>
+            </div>
+            <h3>武家女当主アヤメの受難 ～刀と愛と助平小僧から離れられない体～<br />罐头武家线 / ぶるーむふらっしゅ</h3>
+            <p>配置很会抓人，和服、女主、同社团老味道全都在；但玩下来就是一套公式跑完，能吃，也确实像工业罐头。</p>
+            <div class="chip-row">
+              <span class="chip red">女主人公</span><span class="chip">浴衣/和服</span><span class="chip">被NTR(苦主视角)</span><span class="chip">NTR(黄毛视角)</span><span class="chip">高潮脸/阿黑颜</span>
+            </div>
+            <p class="source-note">以你给的测评图为准，网络未稳定核验</p>
+            <div class="button-row">
+              <a class="rf-button primary" href="./reviews/ayame-suffering/" data-open="ayame-suffering">打开测评</a>
+
+    <button class="like-button" data-like="ayame-suffering" data-like-label="Like" aria-pressed="false">
+      <span>Like</span>
+      <b data-like-count="ayame-suffering">0</b>
+    </button>
+
+            </div>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <a class="review-card-image" href="./reviews/blue-moon-abyss/" data-open="blue-moon-abyss">
+            <img src="./assets/images/user-reviews/review-blue-moon-title.jpg" alt="青の月は深淵に染まる" loading="lazy" />
+            <div class="card-score">3.5</div>
+          </a>
+          <div class="review-card-body">
+            <div class="review-card-kicker">
+              <span>ネコノオシ</span>
+              <span>2026-06-06</span>
+            </div>
+            <h3>青の月は深淵に染まる<br />像素深渊线 / ネコノオシ</h3>
+            <p>场景气质有，题材也能让人进门；但剧情和系统像没拧紧的机器，越往后越暴露短板。</p>
+            <div class="chip-row">
+              <span class="chip red">像素</span><span class="chip">BSS/暗恋被抢</span><span class="chip">被NTR(苦主视角)</span><span class="chip">男女</span><span class="chip">口交</span><span class="chip">巨乳/爆乳</span>
+            </div>
+            <p class="source-note">以你给的测评图为准，网络未稳定核验</p>
+            <div class="button-row">
+              <a class="rf-button primary" href="./reviews/blue-moon-abyss/" data-open="blue-moon-abyss">打开测评</a>
+
+    <button class="like-button" data-like="blue-moon-abyss" data-like-label="Like" aria-pressed="false">
+      <span>Like</span>
+      <b data-like-count="blue-moon-abyss">0</b>
+    </button>
+
+            </div>
+          </div>
+        </article>
+        <!-- static:reviews:end -->
+      </section>
 
       <section class="split-band" id="watchlist" data-section="watchlist">
         <div class="section-rule compact">
           <div>
-            <span>Watchlist</span>
-            <h2>New Release Radar</h2>
+            <span>MOST ANTICIPATED</span>
+            <h2>26年下半年新作前瞻</h2>
           </div>
         </div>
-        <div class="watchlist" id="watchlist-list"></div>
+        <div class="watchlist" id="watchlist-list">
+          <!-- static:watchlist:start -->
+
+          <article class="watch-month">
+            <h3>2026.06 / JUNE</h3>
+            <div class="watch-items">
+
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="コード:アポカリプス -崔絃の神姫と奈落の王-" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年6月下旬</span>
+                  </div>
+                  <h4>コード:アポカリプス -崔絃の神姫と奈落の王-</h4>
+                  <p>标题和包装都很会摆，战斗幻想味很足。先给 B，不是因为稳，而是这种大标题最容易看上去很大、落地很小。</p>
+                </div>
+                <div class="watch-score">B</div>
+              </div>
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="奪勝少女レイラ ～セカイのために、この身を捧ぐ供犠契約～" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年6月下旬</span>
+                  </div>
+                  <h4>奪勝少女レイラ ～セカイのために、この身を捧ぐ供犠契約～</h4>
+                  <p>前瞻图的卖点很直，但风险也很直。先放低期待，等实际文本和系统能不能撑住。</p>
+                </div>
+                <div class="watch-score">C</div>
+              </div>
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="ロレッタ・メイデン ～適合率0%の劣等兵～" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年6月下旬</span>
+                  </div>
+                  <h4>ロレッタ・メイデン ～適合率0%の劣等兵～</h4>
+                  <p>人设和队列感不错，比较像能做出目录页的作品。问题还是老问题，别只有设定会吹。</p>
+                </div>
+                <div class="watch-score">B</div>
+              </div>
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="相克のアルデール" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年6月</span>
+                  </div>
+                  <h4>相克のアルデール</h4>
+                  <p>先按观望处理。图面信息不差，但目前看不出它能不能有核心记忆点。</p>
+                </div>
+                <div class="watch-score">C</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="watch-month">
+            <h3>2026.07 / JULY</h3>
+            <div class="watch-items">
+
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="堕ちた聖涙:夜行令" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年7月</span>
+                  </div>
+                  <h4>堕ちた聖涙:夜行令</h4>
+                  <p>这类一眼高期待，主要看它到底是有压迫感，还是只会把氛围词堆满。先给 S-，等实物审判。</p>
+                </div>
+                <div class="watch-score">S-</div>
+              </div>
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="NTR RPG オチカノ-ANOTHER-" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年7月</span>
+                  </div>
+                  <h4>NTR RPG オチカノ-ANOTHER-</h4>
+                  <p>前瞻图里最像能冲的一个。RPG、ANOTHER、角色量都摆出来了，成败就看系统别又做成机械劳动。</p>
+                </div>
+                <div class="watch-score">S-</div>
+              </div>
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="魔法少女ヒナイロの#NTR #帥ハメ #生配信" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年7月</span>
+                  </div>
+                  <h4>魔法少女ヒナイロの#NTR #帥ハメ #生配信</h4>
+                  <p>标题已经把牌摊桌上了。传播感强，但也最容易只剩标签。先 B，等看文本有没有脑子。</p>
+                </div>
+                <div class="watch-score">B</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="watch-month">
+            <h3>2026.08 / AUGUST</h3>
+            <div class="watch-items">
+
+              <div class="watch-item">
+                <img src="./assets/images/user-reviews/preview-2026-h2-title.jpg" alt="BOXMAN/箱男" loading="lazy" />
+                <div>
+                  <div class="review-card-kicker">
+                    <span>图内信息待补源</span>
+                    <span>2026年8月21日前后</span>
+                  </div>
+                  <h4>BOXMAN/箱男</h4>
+                  <p>标题气质很怪，这反而值得盯一下。怪题材最怕做成噱头，也最可能突然给点新味道。</p>
+                </div>
+                <div class="watch-score">B</div>
+              </div>
+            </div>
+          </article>
+        <!-- static:watchlist:end -->
+        </div>
       </section>
 
       <section class="tier-maker" id="annual-tier" data-section="annualTier">
@@ -86,22 +369,150 @@
       <section class="rankings" id="rankings" data-section="rankings">
         <div class="section-rule compact">
           <div>
-            <span>Rankings</span>
-            <h2>Editor's Board</h2>
+            <span>EDITOR&#039;S BOARD</span>
+            <h2>分组榜单</h2>
           </div>
         </div>
-        <div class="ranking-grid" id="ranking-grid"></div>
+        <div class="ranking-grid" id="ranking-grid">
+          <!-- static:rankings:start -->
+
+          <article class="ranking-list">
+            <h3>当前推荐顺位</h3>
+            <ol>
+
+              <li>
+                <b>01</b>
+                <strong>妻の一番綺麗な姿<br /><span>短篇完成度</span></strong>
+                <b>7.6</b>
+              </li>
+              <li>
+                <b>02</b>
+                <strong>武家女当主アヤメの受難<br /><span>罐头稳定档</span></strong>
+                <b>6.3</b>
+              </li>
+              <li>
+                <b>03</b>
+                <strong>青の月は深淵に染まる<br /><span>慎入观察</span></strong>
+                <b>3.5</b>
+              </li>
+            </ol>
+          </article>
+
+          <article class="ranking-list">
+            <h3>最值得长评</h3>
+            <ol>
+
+              <li>
+                <b>01</b>
+                <strong>妻の一番綺麗な姿<br /><span>短篇为何能成立</span></strong>
+                <b>A-</b>
+              </li>
+              <li>
+                <b>02</b>
+                <strong>武家女当主アヤメの受難<br /><span>社团模板研究</span></strong>
+                <b>B</b>
+              </li>
+              <li>
+                <b>03</b>
+                <strong>NTR RPG オチカノ-ANOTHER-<br /><span>前瞻重点</span></strong>
+                <b>S-</b>
+              </li>
+            </ol>
+          </article>
+
+          <article class="ranking-list">
+            <h3>雷达弱项样本</h3>
+            <ol>
+
+              <li>
+                <b>01</b>
+                <strong>青の月は深淵に染まる<br /><span>剧情失守</span></strong>
+                <b>2.0</b>
+              </li>
+              <li>
+                <b>02</b>
+                <strong>武家女当主アヤメの受難<br /><span>公式化虐心</span></strong>
+                <b>6.0</b>
+              </li>
+              <li>
+                <b>03</b>
+                <strong>妻の一番綺麗な姿<br /><span>体量偏小</span></strong>
+                <b>短</b>
+              </li>
+            </ol>
+          </article>
+        <!-- static:rankings:end -->
+        </div>
       </section>
 
       <section class="community" id="community" data-section="community">
         <div class="section-rule compact">
           <div>
-            <span>Community</span>
-            <h2>Likes & Polls</h2>
+            <span>COMMUNITY</span>
+            <h2>点赞 &amp; 调研</h2>
           </div>
           <p id="cloud-status">互动数据：本地预览模式。配置 Firebase 后，访客会看到同一份点赞和投票结果。</p>
         </div>
-        <div class="poll-grid" id="poll-grid"></div>
+        <div class="poll-grid" id="poll-grid">
+          <!-- static:polls:start -->
+
+          <article class="poll-card">
+            <div>
+              <span class="eyebrow">Reader Poll</span>
+              <h3>下一篇先审判谁？</h3>
+            </div>
+            <p>用于决定下一篇长评方向。Firebase 配好后，所有访客会看到同一份投票结果。</p>
+            <div class="poll-options">
+
+              <button class="poll-option" data-poll="next-review-focus" data-option="short-good" style="--poll-width:0%" aria-pressed="false">
+                <strong>短篇黑马</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="next-review-focus" data-option="studio-can" style="--poll-width:0%" aria-pressed="false">
+                <strong>罐头社团</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="next-review-focus" data-option="bad-sample" style="--poll-width:0%" aria-pressed="false">
+                <strong>低分样本</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="next-review-focus" data-option="watchlist" style="--poll-width:0%" aria-pressed="false">
+                <strong>新作前瞻</strong>
+                <span>0% / 0</span>
+              </button>
+            </div>
+            <div class="poll-total">0 votes</div>
+          </article>
+
+          <article class="poll-card">
+            <div>
+              <span class="eyebrow">Reader Poll</span>
+              <h3>站点下一步先加什么？</h3>
+            </div>
+            <p>这不是装饰投票，后续改版可以直接按这个来排优先级。</p>
+            <div class="poll-options">
+
+              <button class="poll-option" data-poll="site-feature-priority" data-option="comments" style="--poll-width:0%" aria-pressed="false">
+                <strong>评论区</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="site-feature-priority" data-option="filters" style="--poll-width:0%" aria-pressed="false">
+                <strong>细标签筛选</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="site-feature-priority" data-option="gallery" style="--poll-width:0%" aria-pressed="false">
+                <strong>图片画廊</strong>
+                <span>0% / 0</span>
+              </button>
+              <button class="poll-option" data-poll="site-feature-priority" data-option="submit" style="--poll-width:0%" aria-pressed="false">
+                <strong>读者投稿口</strong>
+                <span>0% / 0</span>
+              </button>
+            </div>
+            <div class="poll-total">0 votes</div>
+          </article>
+        <!-- static:polls:end -->
+        </div>
       </section>
 
       <section class="notes" id="notes" data-section="notes">
@@ -146,12 +557,22 @@
     </dialog>
 
     <footer class="site-footer">
-      <span id="footer-brand">ReviewFork</span>
+      <span id="footer-brand">ReviewFork / NTRGAME Editorial Archive</span>
       <span>Built for GitHub Pages. Reviews are editable from data/site-data.js.</span>
     </footer>
 
     <noscript>
-      <div class="noscript">这个站点需要开启 JavaScript 才能读取测评数据。</div>
+      <section class="noscript" aria-label="无脚本阅读入口">
+        <strong>静态阅读模式</strong>
+        <p>页面核心内容已经直接写入 HTML。开启 JavaScript 后，点赞、投票、年度排名编辑和弹窗阅读会继续增强。</p>
+        <ul class="static-review-links">
+          <!-- static:noscript:start -->
+<li><a href="./reviews/wife-kirei/">妻の一番綺麗な姿 / 7.6</a></li>
+          <li><a href="./reviews/ayame-suffering/">武家女当主アヤメの受難 ～刀と愛と助平小僧から離れられない体～ / 6.3</a></li>
+          <li><a href="./reviews/blue-moon-abyss/">青の月は深淵に染まる / 3.5</a></li>
+        <!-- static:noscript:end -->
+        </ul>
+      </section>
     </noscript>
   </body>
 </html>

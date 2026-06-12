@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build:static": "node scripts/build-static.js",
+    "export:html": "node scripts/build-static.js && node scripts/export-single-html.js",
+    "check": "node --check scripts/app.js && node --check scripts/build-static.js && node --check scripts/export-single-html.js && node --check data/site-data.js"
+  },
+  "devDependencies": {}
+}
